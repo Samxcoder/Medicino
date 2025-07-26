@@ -507,7 +507,8 @@ function showAbout() {
         
         <div style="background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 10px; padding: 1rem;">
             <p style="color: var(--text-secondary); text-align: center; margin: 0;">
-                <strong style="color: #667eea;">Disclaimer:</strong> This application is for educational and informational purposes only. 
+                <strong style="color: #667eea;">Disclaimer:</strong> 
+                This application is for educational and informational purposes only. 
                 It is not intended to replace professional medical advice, diagnosis, or treatment.
             </p>
         </div>
