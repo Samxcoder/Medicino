@@ -6,15 +6,15 @@
 }
 
 :root {
-    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-    --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    --primary-gradient: linear-gradient(135deg, #291d5f 0%, #258b3f, #e13939 100%);
+    --secondary-gradient: linear-gradient(135deg, #1d5a34 0%, #8f2323 100%);
+    --success-gradient: linear-gradient(135deg, #25547c 0%, #38898d 100%);
+    --warning-gradient: linear-gradient(135deg, #319753 0%, #229680 100%);
+    --danger-gradient: linear-gradient(135deg, #a34964 0%, #9c8b2a 100%);
     
     --bg-primary: #0f0f23;
     --bg-secondary: #1a1a3e;
-    --bg-card: rgba(255, 255, 255, 0.05);
+    --bg-card: #0d0643;
     --text-primary: #ffffff;
     --text-secondary: #b8b9db;
     --border-color: rgba(255, 255, 255, 0.1);
