@@ -7,10 +7,10 @@
 
 :root {
     --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-    --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    --secondary-gradient: linear-gradient(135deg, #a75caf 0%, #ac2f3f 100%);
+    --success-gradient: linear-gradient(135deg, #7ea3c4 0%, #1b777c 100%);
+    --warning-gradient: linear-gradient(135deg, #2a994f 0%, #52bba8 100%);
+    --danger-gradient: linear-gradient(135deg, #a03757 0%, #867930 100%);
     
     --bg-primary: #0f0f23;
     --bg-secondary: #1a1a3e;
