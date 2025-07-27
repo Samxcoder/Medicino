@@ -1,696 +1,1224 @@
-// Configuration
-const API_BASE_URL = 'http://localhost:5000'; // Change this to your backend URL
+// Medicino Web Application - Complete JavaScript Implementation
+// Author: AI Assistant
+// Version: 1.0
 
-// DOM Elements
-const symptomsInput = document.getElementById('symptomsInput');
-const diagnoseBtn = document.getElementById('diagnoseBtn');
-const voiceBtn = document.getElementById('voiceBtn');
-const clearBtn = document.getElementById('clearBtn');
-const diagnosisLoader = document.getElementById('diagnosisLoader');
-const diagnosisResult = document.getElementById('diagnosisResult');
+// Global Configuration
+const CONFIG = {
+    API_BASE_URL: 'http://localhost:5000/api',
+    FLASK_BASE_URL: 'http://localhost:5000',
+    DJANGO_BASE_URL: 'http://localhost:8000',
+    CURRENT_BACKEND: 'flask', // 'flask' or 'django'
+    VOICE_RECOGNITION_TIMEOUT: 10000,
+    API_TIMEOUT: 10000
+};
 
-const medicineInput = document.getElementById('medicineInput');
-const searchMedicineBtn = document.getElementById('searchMedicineBtn');
-const showAllBtn = document.getElementById('showAllBtn');
-const medicineLoader = document.getElementById('medicineLoader');
-const medicineInfoResult = document.getElementById('medicineInfoResult');
+// Global State Management
+const AppState = {
+    isListening: false,
+    currentDiagnosis: null,
+    diagnosisHistory: [],
+    allMedicines: [],
+    isLoading: false
+};
 
-// Initialize App
-document.addEventListener('DOMContentLoaded', () => {
-    initializeApp();
-    setupEventListeners();
-});
-
-function initializeApp() {
-    console.log('🏥 Medicino Frontend initialized successfully!');
-    
-    // Add welcome animation
-    setTimeout(() => {
-        document.body.style.animation = 'fadeIn 0.5s ease-in';
-    }, 100);
-}
-
-function setupEventListeners() {
-    // Symptom diagnosis
-    diagnoseBtn.addEventListener('click', handleDiagnosis);
-    
-    // Voice input
-    voiceBtn.addEventListener('click', handleVoiceInput);
-    
-    // Clear button
-    clearBtn.addEventListener('click', () => {
-        symptomsInput.value = '';
-        hideElement(diagnosisResult);
-    });
-    
-    // Medicine search
-    searchMedicineBtn.addEventListener('click', handleMedicineSearch);
-    showAllBtn.addEventListener('click', handleShowAllMedicines);
-    
-    // Enter key support
-    symptomsInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && e.ctrlKey) {
-            handleDiagnosis();
+// Utility Functions
+const Utils = {
+    // Show/hide elements with animation
+    show: (element) => {
+        if (typeof element === 'string') {
+            element = document.getElementById(element);
         }
-    });
-    
-    medicineInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            handleMedicineSearch();
+        if (element) {
+            element.classList.remove('hidden');
+            element.style.animation = 'fadeIn 0.5s ease-out';
         }
-    });
-    
-    // Quick actions
-    document.getElementById('historyBtn').addEventListener('click', showHistory);
-    document.getElementById('emergencyBtn').addEventListener('click', showEmergencyGuide);
-    document.getElementById('aboutBtn').addEventListener('click', showAbout);
-}
+    },
 
-// Diagnosis Functions
-async function handleDiagnosis() {
-    const symptoms = symptomsInput.value.trim();
-    
-    if (!symptoms) {
-        showNotification('Please enter your symptoms first.', 'warning');
-        return;
+    hide: (element) => {
+        if (typeof element === 'string') {
+            element = document.getElementById(element);
+        }
+        if (element) {
+            element.classList.add('hidden');
+        }
+    },
+
+    // Show loading state
+    showLoader: (loaderId) => {
+        Utils.show(loaderId);
+    },
+
+    hideLoader: (loaderId) => {
+        Utils.hide(loaderId);
+    },
+
+    // Format text for display
+    formatText: (text) => {
+        if (!text) return 'Not available';
+        return text.charAt(0).toUpperCase() + text.slice(1);
+    },
+
+    // Clean and validate symptoms input
+    cleanSymptoms: (symptoms) => {
+        return symptoms
+            .toLowerCase()
+            .trim()
+            .replace(/[^\w\s,.-]/g, '') // Remove special characters except common ones
+            .replace(/\s+/g, ' '); // Remove extra spaces
+    },
+
+    // Show notification
+    showNotification: (message, type = 'info') => {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+            ${message}
+        `;
+
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideInRight 0.3s ease-out;
+            max-width: 300px;
+            font-weight: 500;
+        `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-out';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 4000);
+    },
+
+    // Validate symptoms input
+    validateSymptoms: (symptoms) => {
+        const cleaned = Utils.cleanSymptoms(symptoms);
+        if (!cleaned || cleaned.length < 3) {
+            return { valid: false, message: 'Please enter at least 3 characters describing your symptoms' };
+        }
+        if (cleaned.length > 500) {
+            return { valid: false, message: 'Symptoms description is too long (max 500 characters)' };
+        }
+        return { valid: true, cleaned: cleaned };
     }
-    
-    showLoader(diagnosisLoader);
-    hideElement(diagnosisResult);
-    
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/diagnose`, {
-            method: 'POST',
+};
+
+// API Service
+const ApiService = {
+    // Get current API base URL
+    getApiUrl: () => {
+        return CONFIG.CURRENT_BACKEND === 'django' ?
+            `${CONFIG.DJANGO_BASE_URL}/api` :
+            CONFIG.API_BASE_URL;
+    },
+
+    // Generic API request function
+    request: async (endpoint, options = {}) => {
+        const url = `${ApiService.getApiUrl()}${endpoint}`;
+        const defaultOptions = {
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
+            timeout: CONFIG.API_TIMEOUT
+        };
+
+        const requestOptions = { ...defaultOptions, ...options };
+
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), requestOptions.timeout);
+
+            const response = await fetch(url, {
+                ...requestOptions,
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('API Request Error:', error);
+            if (error.name === 'AbortError') {
+                throw new Error('Request timeout. Please check your connection and try again.');
+            }
+            throw error;
+        }
+    },
+
+    // Diagnose symptoms
+    diagnose: async (symptoms) => {
+        const endpoint = CONFIG.CURRENT_BACKEND === 'django' ? '/diagnose/' : '/diagnose';
+        return await ApiService.request(endpoint, {
+            method: 'POST',
             body: JSON.stringify({ symptoms: symptoms })
         });
-        
-        const result = await response.json();
-        
-        hideLoader(diagnosisLoader);
-        
-        if (result.success) {
-            displayDiagnosisResult(result.data);
+    },
+
+    // Get medicine information
+    getMedicine: async (medicineName) => {
+        const endpoint = CONFIG.CURRENT_BACKEND === 'django' ?
+            `/medicine/${encodeURIComponent(medicineName)}/` :
+            `/medicine/${encodeURIComponent(medicineName)}`;
+        return await ApiService.request(endpoint);
+    },
+
+    // Get all medicines
+    getAllMedicines: async () => {
+        const endpoint = CONFIG.CURRENT_BACKEND === 'django' ? '/medicines/' : '/medicines';
+        return await ApiService.request(endpoint);
+    },
+
+    // Get diagnosis history
+    getHistory: async () => {
+        const endpoint = CONFIG.CURRENT_BACKEND === 'django' ? '/history/' : '/history';
+        return await ApiService.request(endpoint);
+    }
+};
+
+// Voice Recognition Service
+const VoiceService = {
+    recognition: null,
+    isSupported: false,
+
+    init: () => {
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            VoiceService.recognition = new SpeechRecognition();
+            VoiceService.recognition.continuous = false;
+            VoiceService.recognition.interimResults = false;
+            VoiceService.recognition.lang = 'en-US';
+            VoiceService.isSupported = true;
+
+            VoiceService.recognition.onstart = () => {
+                AppState.isListening = true;
+                const voiceBtn = document.getElementById('voiceBtn');
+                voiceBtn.classList.add('listening');
+                voiceBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Listening...';
+                Utils.showNotification('Listening... Please speak your symptoms clearly', 'info');
+            };
+
+            VoiceService.recognition.onend = () => {
+                AppState.isListening = false;
+                const voiceBtn = document.getElementById('voiceBtn');
+                voiceBtn.classList.remove('listening');
+                voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> Voice Input';
+            };
+
+            VoiceService.recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                AppState.isListening = false;
+                const voiceBtn = document.getElementById('voiceBtn');
+                voiceBtn.classList.remove('listening');
+                voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> Voice Input';
+
+                let errorMessage = 'Voice recognition error. ';
+                switch (event.error) {
+                    case 'no-speech':
+                        errorMessage += 'No speech detected. Please try again.';
+                        break;
+                    case 'network':
+                        errorMessage += 'Network error. Please check your connection.';
+                        break;
+                    case 'not-allowed':
+                        errorMessage += 'Microphone access denied. Please enable microphone permissions.';
+                        break;
+                    default:
+                        errorMessage += 'Please try again.';
+                }
+                Utils.showNotification(errorMessage, 'error');
+            };
+
+            VoiceService.recognition.onresult = (event) => {
+                const result = event.results[0][0].transcript;
+                document.getElementById('symptomsInput').value = result;
+                Utils.showNotification(`Voice input received: "${result}"`, 'success');
+            };
         } else {
-            showNotification('Diagnosis failed: ' + result.message, 'error');
+            console.warn('Speech recognition not supported in this browser');
         }
-        
-    } catch (error) {
-        hideLoader(diagnosisLoader);
-        console.error('Diagnosis error:', error);
-        showNotification('Network error. Please check if the backend server is running.', 'error');
-    }
-}
+    },
 
-function displayDiagnosisResult(data) {
-    document.getElementById('diseaseOutput').textContent = data.disease;
-    document.getElementById('ayurvedicOutput').textContent = data.ayurvedic;
-    document.getElementById('medicineOutput').textContent = data.medicine;
-    
-    // Confidence score
-    const confidenceText = document.getElementById('confidenceText');
-    const confidenceFill = document.getElementById('confidenceFill');
-    
-    confidenceText.textContent = `${data.confidence}% confidence - AI analysis based on symptom matching`;
-    
-    // Animate confidence bar
-    setTimeout(() => {
-        confidenceFill.style.width = `${data.confidence}%`;
-    }, 500);
-    
-    // Severity badge
-    const severityBadge = document.getElementById('severityBadge');
-    if (data.severity && data.severity !== 'unknown') {
-        severityBadge.innerHTML = `
-            <div class="severity-badge severity-${data.severity}">
-                <i class="fas fa-exclamation-${data.severity === 'severe' ? 'triangle' : 'circle'}"></i>
-                Severity: ${data.severity.toUpperCase()}
-            </div>
-        `;
-    }
-    
-    showElement(diagnosisResult);
-}
-
-// Voice Input Function
-function handleVoiceInput() {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        showNotification('Speech recognition is not supported in this browser. Please use Chrome or Edge.', 'warning');
-        return;
-    }
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = 'en-US';
-
-    recognition.onstart = () => {
-        voiceBtn.classList.add('listening');
-        voiceBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Listening...';
-        showNotification('Listening... Please speak your symptoms clearly.', 'info');
-    };
-
-    recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        symptomsInput.value = transcript;
-        showNotification('Voice input captured successfully!', 'success');
-    };
-
-    recognition.onend = () => {
-        voiceBtn.classList.remove('listening');
-        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> Voice Input';
-    };
-
-    recognition.onerror = (event) => {
-        voiceBtn.classList.remove('listening');
-        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> Voice Input';
-        showNotification('Speech recognition error: ' + event.error, 'error');
-    };
-
-    recognition.start();
-}
-
-// Medicine Search Functions
-async function handleMedicineSearch() {
-    const medicineName = medicineInput.value.trim();
-    
-    if (!medicineName) {
-        showNotification('Please enter a medicine name.', 'warning');
-        return;
-    }
-    
-    showLoader(medicineLoader);
-    hideElement(medicineInfoResult);
-    
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/medicine/${encodeURIComponent(medicineName)}`);
-        const result = await response.json();
-        
-        hideLoader(medicineLoader);
-        
-        if (result.success && result.data) {
-            displayMedicineResult(result.data);
-        } else {
-            displayNoMedicineFound(medicineName);
+    start: () => {
+        if (VoiceService.isSupported && VoiceService.recognition && !AppState.isListening) {
+            try {
+                VoiceService.recognition.start();
+            } catch (error) {
+                console.error('Error starting voice recognition:', error);
+                Utils.showNotification('Could not start voice recognition. Please try again.', 'error');
+            }
+        } else if (!VoiceService.isSupported) {
+            Utils.showNotification('Voice recognition is not supported in your browser', 'error');
         }
-        
-    } catch (error) {
-        hideLoader(medicineLoader);
-        console.error('Medicine search error:', error);
-        showNotification('Network error. Please check if the backend server is running.', 'error');
-    }
-}
+    },
 
-async function handleShowAllMedicines() {
-    showLoader(medicineLoader);
-    hideElement(medicineInfoResult);
-    
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/medicines`);
-        const result = await response.json();
-        
-        hideLoader(medicineLoader);
-        
-        if (result.success) {
-            displayAllMedicines(result.data);
-        } else {
-            showNotification('Failed to load medicines list.', 'error');
+    stop: () => {
+        if (VoiceService.recognition && AppState.isListening) {
+            VoiceService.recognition.stop();
         }
-        
-    } catch (error) {
-        hideLoader(medicineLoader);
-        console.error('Medicines list error:', error);
-        showNotification('Network error. Please check if the backend server is running.', 'error');
     }
-}
+};
 
-function displayMedicineResult(medicine) {
-    medicineInfoResult.innerHTML = `
-        <h3 style="margin-bottom: 1.5rem; color: #f093fb;">
-            <i class="fas fa-pill"></i>
-            Medicine Details
-        </h3>
-        <div class="medicine-card">
-            <div class="medicine-name">${medicine.name}</div>
-            
-            <div class="medicine-detail">
-                <strong><i class="fas fa-info-circle"></i> Description:</strong>
-                <span>${medicine.description}</span>
-            </div>
-            
-            <div class="medicine-detail">
-                <strong><i class="fas fa-clock"></i> Dosage:</strong>
-                <span>${medicine.dosage}</span>
-            </div>
-            
-            <div class="medicine-detail">
-                <strong><i class="fas fa-exclamation-triangle"></i> Side Effects:</strong>
-                <span>${medicine.side_effects}</span>
-            </div>
-            
-            <div class="medicine-detail">
-                <strong><i class="fas fa-ban"></i> Contraindications:</strong>
-                <span>${medicine.contraindications}</span>
-            </div>
-            
-            <div class="medicine-detail">
-                <strong><i class="fas fa-tag"></i> Category:</strong>
-                <span style="text-transform: capitalize;">${medicine.category || 'General'}</span>
-            </div>
-            
-            <div style="margin-top: 1.5rem; text-align: center;">
-                <div class="price-tag">
-                    <i class="fas fa-rupee-sign"></i>
-                    ${medicine.price}
-                </div>
-            </div>
-        </div>
-    `;
-    
-    showElement(medicineInfoResult);
-}
+// Diagnosis Handler
+const DiagnosisHandler = {
+    diagnose: async () => {
+        const symptomsInput = document.getElementById('symptomsInput');
+        const symptoms = symptomsInput.value.trim();
 
-function displayNoMedicineFound(medicineName) {
-    medicineInfoResult.innerHTML = `
-        <div class="medicine-card" style="text-align: center; border-color: rgba(255, 65, 108, 0.3);">
-            <div style="font-size: 3rem; color: #ff416c; margin-bottom: 1rem;">
-                <i class="fas fa-search-minus"></i>
-            </div>
-            <h3 style="color: #ff416c; margin-bottom: 1rem;">Medicine Not Found</h3>
-            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem;">
-                The medicine "<strong style="color: var(--text-primary);">${medicineName}</strong>" was not found in our database. 
-                Please check the spelling or try searching with a different name.
-            </p>
-            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                <button class="btn btn-primary" onclick="document.getElementById('medicineInput').focus()">
-                    <i class="fas fa-search"></i>
-                    Try Another Search
-                </button>
-                <button class="btn btn-secondary" onclick="handleShowAllMedicines()">
-                    <i class="fas fa-list"></i>
-                    Browse All Medicines
-                </button>
-            </div>
-        </div>
-    `;
-    
-    showElement(medicineInfoResult);
-}
+        // Validate input
+        const validation = Utils.validateSymptoms(symptoms);
+        if (!validation.valid) {
+            Utils.showNotification(validation.message, 'error');
+            symptomsInput.focus();
+            return;
+        }
 
-function displayAllMedicines(medicines) {
-    if (!medicines || medicines.length === 0) {
-        medicineInfoResult.innerHTML = `
-            <div class="medicine-card" style="text-align: center;">
-                <h3 style="color: #667eea;">No medicines found in the database.</h3>
-            </div>
-        `;
-        showElement(medicineInfoResult);
-        return;
+        const cleanedSymptoms = validation.cleaned;
+
+        // Show loading state
+        Utils.showLoader('diagnosisLoader');
+        Utils.hide('diagnosisResult');
+
+        const diagnoseBtn = document.getElementById('diagnoseBtn');
+        const originalBtnText = diagnoseBtn.innerHTML;
+        diagnoseBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+        diagnoseBtn.disabled = true;
+
+        try {
+            const response = await ApiService.diagnose(cleanedSymptoms);
+
+            if (response.success && response.data) {
+                AppState.currentDiagnosis = response.data;
+                DiagnosisHandler.displayResults(response.data);
+                Utils.showNotification('Diagnosis completed successfully!', 'success');
+            } else {
+                throw new Error(response.message || 'Diagnosis failed');
+            }
+        } catch (error) {
+            console.error('Diagnosis error:', error);
+            Utils.showNotification(`Diagnosis failed: ${error.message}`, 'error');
+            Utils.hide('diagnosisResult');
+        } finally {
+            Utils.hideLoader('diagnosisLoader');
+            diagnoseBtn.innerHTML = originalBtnText;
+            diagnoseBtn.disabled = false;
+        }
+    },
+
+    displayResults: (data) => {
+        // Update disease output
+        document.getElementById('diseaseOutput').textContent = Utils.formatText(data.disease);
+
+        // Update severity badge
+        const severityBadge = document.getElementById('severityBadge');
+        const severity = data.severity || 'unknown';
+        severityBadge.innerHTML = `<span class="severity-badge severity-${severity}">
+            <i class="fas fa-${DiagnosisHandler.getSeverityIcon(severity)}"></i>
+            ${Utils.formatText(severity)} Severity
+        </span>`;
+
+        // Update Ayurvedic remedy
+        document.getElementById('ayurvedicOutput').textContent = data.ayurvedic || 'No Ayurvedic remedy available';
+
+        // Update medicine suggestion
+        document.getElementById('medicineOutput').textContent = data.medicine || 'No medicine suggestion available';
+
+        // Update confidence score
+        const confidence = Math.min(Math.max(data.confidence || 0, 0), 100);
+        document.getElementById('confidenceText').textContent = `${confidence.toFixed(1)}%`;
+
+        // Animate confidence bar
+        const confidenceFill = document.getElementById('confidenceFill');
+        setTimeout(() => {
+            confidenceFill.style.width = `${confidence}%`;
+        }, 300);
+
+        // Show results
+        Utils.show('diagnosisResult');
+
+        // Scroll to results
+        document.getElementById('diagnosisResult').scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+    },
+
+    getSeverityIcon: (severity) => {
+        switch (severity.toLowerCase()) {
+            case 'mild': return 'smile';
+            case 'moderate': return 'meh';
+            case 'severe': return 'frown';
+            case 'critical': return 'exclamation-triangle';
+            default: return 'question-circle';
+        }
+    },
+
+    clear: () => {
+        document.getElementById('symptomsInput').value = '';
+        Utils.hide('diagnosisResult');
+        Utils.hide('diagnosisLoader');
+        AppState.currentDiagnosis = null;
+
+        // Reset confidence bar
+        document.getElementById('confidenceFill').style.width = '0%';
     }
+};
 
-    let medicinesHTML = `
-        <h3 style="margin-bottom: 1.5rem; color: #f093fb;">
-            <i class="fas fa-pills"></i>
-            All Medicines (${medicines.length} found)
-        </h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1rem;">
-    `;
+// Medicine Handler
+const MedicineHandler = {
+    search: async () => {
+        const medicineInput = document.getElementById('medicineInput');
+        const medicineName = medicineInput.value.trim();
 
-    medicines.forEach(medicine => {
-        medicinesHTML += `
-            <div class="medicine-card">
-                <div class="medicine-name">${medicine.name}</div>
-                
-                <div class="medicine-detail">
-                    <strong>Description:</strong>
-                    <span>${medicine.description.substring(0, 100)}${medicine.description.length > 100 ? '...' : ''}</span>
-                </div>
-                
-                <div class="medicine-detail">
-                    <strong>Category:</strong>
-                    <span style="text-transform: capitalize;">${medicine.category || 'General'}</span>
-                </div>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
-                    <div class="price-tag">
-                        <i class="fas fa-rupee-sign"></i>
-                        ${medicine.price}
+        if (!medicineName) {
+            Utils.showNotification('Please enter a medicine name', 'error');
+            medicineInput.focus();
+            return;
+        }
+
+        if (medicineName.length < 2) {
+            Utils.showNotification('Please enter at least 2 characters', 'error');
+            return;
+        }
+
+        // Show loading state
+        Utils.showLoader('medicineLoader');
+        Utils.hide('medicineInfoResult');
+
+        const searchBtn = document.getElementById('searchMedicineBtn');
+        const originalBtnText = searchBtn.innerHTML;
+        searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+        searchBtn.disabled = true;
+
+        try {
+            const response = await ApiService.getMedicine(medicineName);
+
+            if (response.success && response.data) {
+                MedicineHandler.displayMedicineInfo([response.data]);
+                Utils.showNotification('Medicine found successfully!', 'success');
+            } else {
+                Utils.showNotification('Medicine not found. Try a different name or check spelling.', 'error');
+                document.getElementById('medicineInfoResult').innerHTML = `
+                    <div class="medicine-card" style="text-align: center; color: var(--text-secondary);">
+                        <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <h3>Medicine Not Found</h3>
+                        <p>We couldn't find "${medicineName}" in our database.</p>
+                        <p>Try searching with a different name or check the spelling.</p>
                     </div>
-                    <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;" 
-                            onclick="searchSpecificMedicine('${medicine.name}')">
-                        <i class="fas fa-eye"></i>
-                        View Details
+                `;
+                Utils.show('medicineInfoResult');
+            }
+        } catch (error) {
+            console.error('Medicine search error:', error);
+            Utils.showNotification(`Search failed: ${error.message}`, 'error');
+        } finally {
+            Utils.hideLoader('medicineLoader');
+            searchBtn.innerHTML = originalBtnText;
+            searchBtn.disabled = false;
+        }
+    },
+
+    showAll: async () => {
+        Utils.showLoader('medicineLoader');
+        Utils.hide('medicineInfoResult');
+
+        const showAllBtn = document.getElementById('showAllBtn');
+        const originalBtnText = showAllBtn.innerHTML;
+        showAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        showAllBtn.disabled = true;
+
+        try {
+            const response = await ApiService.getAllMedicines();
+
+            if (response.success && response.data && response.data.length > 0) {
+                AppState.allMedicines = response.data;
+                MedicineHandler.displayMedicineInfo(response.data);
+                Utils.showNotification(`Found ${response.data.length} medicines`, 'success');
+            } else {
+                Utils.showNotification('No medicines found in database', 'error');
+            }
+        } catch (error) {
+            console.error('Error loading medicines:', error);
+            Utils.showNotification(`Failed to load medicines: ${error.message}`, 'error');
+        } finally {
+            Utils.hideLoader('medicineLoader');
+            showAllBtn.innerHTML = originalBtnText;
+            showAllBtn.disabled = false;
+        }
+    },
+
+    displayMedicineInfo: (medicines) => {
+        const resultDiv = document.getElementById('medicineInfoResult');
+
+        if (!medicines || medicines.length === 0) {
+            resultDiv.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No medicines found.</p>';
+            Utils.show('medicineInfoResult');
+            return;
+        }
+
+        let html = '';
+
+        if (medicines.length > 1) {
+            html += `<h3 style="margin-bottom: 1.5rem; color: #f093fb;">
+                <i class="fas fa-pills"></i> Found ${medicines.length} Medicines
+            </h3>`;
+        }
+
+        medicines.forEach(medicine => {
+            html += `
+                <div class="medicine-card">
+                    <div class="medicine-name">
+                        <i class="fas fa-capsules"></i>
+                        ${Utils.formatText(medicine.name)}
+                    </div>
+
+                    <div class="medicine-detail">
+                        <strong><i class="fas fa-info-circle"></i> Description:</strong>
+                        <span>${medicine.description || 'Not available'}</span>
+                    </div>
+
+                    <div class="medicine-detail">
+                        <strong><i class="fas fa-prescription-bottle-alt"></i> Dosage:</strong>
+                        <span>${medicine.dosage || 'Consult healthcare provider'}</span>
+                    </div>
+
+                    <div class="medicine-detail">
+                        <strong><i class="fas fa-exclamation-triangle"></i> Side Effects:</strong>
+                        <span>${medicine.side_effects || 'Not specified'}</span>
+                    </div>
+
+                    <div class="medicine-detail">
+                        <strong><i class="fas fa-ban"></i> Contraindications:</strong>
+                        <span>${medicine.contraindications || 'Not specified'}</span>
+                    </div>
+
+                    <div class="medicine-detail">
+                        <strong><i class="fas fa-tag"></i> Category:</strong>
+                        <span class="category-tag">${Utils.formatText(medicine.category || 'general')}</span>
+                    </div>
+
+                    <div class="medicine-detail" style="align-items: center; margin-top: 1rem;">
+                        <strong><i class="fas fa-rupee-sign"></i> Price:</strong>
+                        <span class="price-tag">
+                            <i class="fas fa-rupee-sign"></i>
+                            ${medicine.price ? parseFloat(medicine.price).toFixed(2) : 'N/A'}
+                        </span>
+                    </div>
+                </div>
+            `;
+        });
+
+        resultDiv.innerHTML = html;
+        Utils.show('medicineInfoResult');
+
+        // Scroll to results if showing all medicines
+        if (medicines.length > 3) {
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+};
+
+// History Handler
+const HistoryHandler = {
+    show: async () => {
+        try {
+            Utils.showNotification('Loading diagnosis history...', 'info');
+            const response = await ApiService.getHistory();
+
+            if (response.success && response.data) {
+                AppState.diagnosisHistory = response.data;
+                HistoryHandler.displayHistory(response.data);
+            } else {
+                Utils.showNotification('No history found', 'error');
+            }
+        } catch (error) {
+            console.error('Error loading history:', error);
+            Utils.showNotification(`Failed to load history: ${error.message}`, 'error');
+        }
+    },
+
+    displayHistory: (history) => {
+        if (!history || history.length === 0) {
+            Utils.showNotification('No diagnosis history available', 'info');
+            return;
+        }
+
+        // Create modal for history display
+        const modal = document.createElement('div');
+        modal.className = 'history-modal';
+        modal.innerHTML = `
+            <div class="modal-overlay" onclick="HistoryHandler.closeModal()"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-history"></i> Diagnosis History</h2>
+                    <button class="close-btn" onclick="HistoryHandler.closeModal()">
+                        <i class="fas fa-times"></i>
                     </button>
                 </div>
-            </div>
-        `;
-    });
-
-    medicinesHTML += '</div>';
-    medicineInfoResult.innerHTML = medicinesHTML;
-    showElement(medicineInfoResult);
-}
-
-function searchSpecificMedicine(medicineName) {
-    medicineInput.value = medicineName;
-    handleMedicineSearch();
-}
-
-// Quick Actions Functions
-async function showHistory() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/history`);
-        const result = await response.json();
-        
-        if (result.success) {
-            displayHistory(result.data);
-        } else {
-            showNotification('Failed to load diagnosis history.', 'error');
-        }
-    } catch (error) {
-        console.error('History error:', error);
-        showNotification('Network error. Please check if the backend server is running.', 'error');
-    }
-}
-
-function displayHistory(historyData) {
-    if (!historyData || historyData.length === 0) {
-        showModal('Diagnosis History', `
-            <div style="text-align: center; padding: 2rem;">
-                <div style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;">
-                    <i class="fas fa-history"></i>
-                </div>
-                <h3 style="color: #667eea; margin-bottom: 1rem;">No History Found</h3>
-                <p style="color: var(--text-secondary);">You haven't made any diagnoses yet. Start by entering your symptoms above!</p>
-            </div>
-        `);
-        return;
-    }
-
-    let historyHTML = `
-        <div style="max-height: 400px; overflow-y: auto;">
-            <h4 style="color: #667eea; margin-bottom: 1rem;">Recent Diagnoses (${historyData.length} records)</h4>
-    `;
-
-    historyData.slice(0, 10).forEach((record, index) => {
-        const date = new Date(record.created_at).toLocaleDateString();
-        const time = new Date(record.created_at).toLocaleTimeString();
-        
-        historyHTML += `
-            <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 1rem; margin-bottom: 1rem; border-left: 4px solid #667eea;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                    <strong style="color: #667eea;">${record.diagnosed_condition}</strong>
-                    <small style="color: var(--text-secondary);">${date} ${time}</small>
-                </div>
-                <div style="color: var(--text-secondary); margin-bottom: 0.5rem;">
-                    <strong>Symptoms:</strong> ${record.symptoms}
-                </div>
-                <div style="color: var(--text-secondary); font-size: 0.9rem;">
-                    Confidence: ${record.confidence_score}%
+                <div class="modal-body">
+                    ${history.map((record, index) => `
+                        <div class="history-item">
+                            <div class="history-header">
+                                <strong>Diagnosis #${history.length - index}</strong>
+                                <span class="history-date">${new Date(record.created_at).toLocaleString()}</span>
+                            </div>
+                            <div class="history-content">
+                                <p><strong>Symptoms:</strong> ${record.symptoms}</p>
+                                <p><strong>Condition:</strong> ${record.diagnosed_condition}</p>
+                                <p><strong>Confidence:</strong> ${record.confidence_score}%</p>
+                                <p><strong>Ayurvedic Remedy:</strong> ${record.ayurvedic_remedy}</p>
+                                <p><strong>Medicine:</strong> ${record.medicine_suggestion}</p>
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         `;
-    });
 
-    historyHTML += '</div>';
-    showModal('Diagnosis History', historyHTML);
-}
+        // Add modal styles
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        `;
 
-function showEmergencyGuide() {
-    const emergencyHTML = `
-        <div style="color: #ff416c; text-align: center; margin-bottom: 1.5rem;">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">
-                <i class="fas fa-ambulance"></i>
-            </div>
-            <h3>Emergency Medical Guide</h3>
-        </div>
-        
-        <div style="background: rgba(255, 65, 108, 0.1); border: 2px solid rgba(255, 65, 108, 0.3); border-radius: 10px; padding: 1rem; margin-bottom: 1.5rem;">
-            <h4 style="color: #ff416c; margin-bottom: 1rem;">⚠️ When to Call Emergency Services</h4>
-            <ul style="color: var(--text-secondary); line-height: 1.8;">
-                <li>Difficulty breathing or shortness of breath</li>
-                <li>Chest pain or pressure</li>
-                <li>Severe allergic reaction</li>
-                <li>Loss of consciousness</li>
-                <li>Severe bleeding</li>
-                <li>Signs of stroke (FAST: Face, Arms, Speech, Time)</li>
-            </ul>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-            <div style="text-align: center;">
-                <div style="font-size: 2rem; color: #ff416c; margin-bottom: 0.5rem;">🚨</div>
-                <strong>Emergency</strong><br>
-                <span style="color: var(--text-secondary);">108 / 112</span>
-            </div>
-            <div style="text-align: center;">
-                <div style="font-size: 2rem; color: #43e97b; margin-bottom: 0.5rem;">🏥</div>
-                <strong>Ambulance</strong><br>
-                <span style="color: var(--text-secondary);">108</span>
-            </div>
-            <div style="text-align: center;">
-                <div style="font-size: 2rem; color: #667eea; margin-bottom: 0.5rem;">☎️</div>
-                <strong>Police</strong><br>
-                <span style="color: var(--text-secondary);">100</span>
-            </div>
-        </div>
-        
-        <div style="background: rgba(67, 233, 123, 0.1); border: 2px solid rgba(67, 233, 123, 0.3); border-radius: 10px; padding: 1rem; margin-top: 1.5rem;">
-            <p style="color: var(--text-secondary); text-align: center; margin: 0;">
-                <strong style="color: #43e97b;">Remember:</strong> This app is for informational purposes only. 
-                Always consult healthcare professionals for serious symptoms.
-            </p>
-        </div>
-    `;
-    
-    showModal('Emergency Medical Guide', emergencyHTML);
-}
+        document.body.appendChild(modal);
 
-function showAbout() {
-    const aboutHTML = `
-        <div style="text-align: center; margin-bottom: 1.5rem;">
-            <div style="font-size: 3rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem;">
-                <i class="fas fa-user-md"></i>
-            </div>
-            <h3 style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">About Medicino</h3>
-        </div>
-        
-        <div style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 1.5rem;">
-            <p style="margin-bottom: 1rem;">
-                Medicino is an AI-powered medical assistant designed to provide intelligent symptom analysis 
-                and medicine information. Our platform combines modern technology with traditional Ayurvedic 
-                wisdom to offer comprehensive healthcare guidance.
-            </p>
-            
-            <h4 style="color: #667eea; margin: 1.5rem 0 1rem 0;">🚀 Features:</h4>
-            <ul style="margin-left: 1rem;">
-                <li>AI-powered symptom diagnosis with confidence scoring</li>
-                <li>Comprehensive medicine database with pricing</li>
-                <li>Ayurvedic treatment recommendations</li>
-                <li>Voice input support for accessibility</li>
-                <li>Diagnosis history tracking</li>
-                <li>Emergency medical guidance</li>
-            </ul>
-            
-            <h4 style="color: #f093fb; margin: 1.5rem 0 1rem 0;">🛡️ Technology Stack:</h4>
-            <ul style="margin-left: 1rem;">
-                <li>Frontend: HTML5, CSS3, Vanilla JavaScript</li>
-                <li>Backend: Flask/Django with Python</li>
-                <li>Database: SQLite with optimized queries</li>
-                <li>APIs: RESTful architecture</li>
-            </ul>
-        </div>
-        
-        <div style="background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 10px; padding: 1rem;">
-            <p style="color: var(--text-secondary); text-align: center; margin: 0;">
-                <strong style="color: #667eea;">Disclaimer:</strong> 
-                This application is for educational and informational purposes only. 
-                It is not intended to replace professional medical advice, diagnosis, or treatment.
-            </p>
-        </div>
-    `;
-    
-    showModal('About Medicino', aboutHTML);
-}
+        // Add CSS for modal components
+        const style = document.createElement('style');
+        style.textContent = `
+            .modal-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                backdrop-filter: blur(5px);
+            }
+            .modal-content {
+                background: var(--bg-secondary);
+                border-radius: 20px;
+                max-width: 800px;
+                max-height: 90vh;
+                width: 90%;
+                border: 1px solid var(--border-color);
+                box-shadow: var(--shadow-glass);
+                position: relative;
+                overflow: hidden;
+            }
+            .modal-header {
+                padding: 1.5rem;
+                border-bottom: 1px solid var(--border-color);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: var(--primary-gradient);
+                color: white;
+            }
+            .modal-body {
+                padding: 1.5rem;
+                max-height: 70vh;
+                overflow-y: auto;
+            }
+            .close-btn {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                padding: 0.5rem;
+                border-radius: 50%;
+                transition: background 0.3s ease;
+            }
+            .close-btn:hover {
+                background: rgba(255, 255, 255, 0.2);
+            }
+            .history-item {
+                background: var(--bg-card);
+                border-radius: 10px;
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-left: 4px solid var(--primary-gradient);
+            }
+            .history-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 0.5rem;
+            }
+            .history-date {
+                color: var(--text-secondary);
+                font-size: 0.9rem;
+            }
+            .history-content p {
+                margin: 0.5rem 0;
+                line-height: 1.5;
+            }
+        `;
+        document.head.appendChild(style);
 
-// Utility Functions
-function showElement(element) {
-    element.classList.remove('hidden');
-    element.style.animation = 'slideInUp 0.5s ease-out';
-}
+        Utils.showNotification(`Loaded ${history.length} diagnosis records`, 'success');
+    },
 
-function hideElement(element) {
-    element.classList.add('hidden');
-}
-
-function showLoader(loader) {
-    loader.classList.remove('hidden');
-}
-
-function hideLoader(loader) {
-    loader.classList.add('hidden');
-}
-
-function showNotification(message, type = 'info') {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${getNotificationColor(type)};
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 10px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        z-index: 10000;
-        font-weight: 500;
-        max-width: 400px;
-        animation: slideInDown 0.3s ease-out;
-    `;
-    
-    notification.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <i class="fas fa-${getNotificationIcon(type)}"></i>
-            <span>${message}</span>
-        </div>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Remove after 5 seconds
-    setTimeout(() => {
-        notification.style.animation = 'slideInUp 0.3s ease-out reverse';
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
-    }, 5000);
-}
-
-function getNotificationColor(type) {
-    const colors = {
-        'success': 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-        'error': 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-        'warning': 'linear-gradient(135deg, #ff9a56 0%, #ff6b95 100%)',
-        'info': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-    };
-    return colors[type] || colors.info;
-}
-
-function getNotificationIcon(type) {
-    const icons = {
-        'success': 'check-circle',
-        'error': 'exclamation-circle',
-        'warning': 'exclamation-triangle',
-        'info': 'info-circle'
-    };
-    return icons[type] || icons.info;
-}
-
-function showModal(title, content) {
-    // Create modal backdrop
-    const backdrop = document.createElement('div');
-    backdrop.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        z-index: 10000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem;
-        animation: fadeIn 0.3s ease-out;
-    `;
-    
-    // Create modal content
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-        background: var(--bg-secondary);
-        border-radius: 20px;
-        padding: 2rem;
-        max-width: 600px;
-        width: 100%;
-        max-height: 80vh;
-        overflow-y: auto;
-        border: 1px solid var(--border-color);
-        box-shadow: var(--shadow-glass);
-        animation: slideInDown 0.3s ease-out;
-    `;
-    
-    modal.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color);">
-            <h3 style="color: var(--text-primary); margin: 0;">${title}</h3>
-            <button id="closeModal" style="background: none; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer; padding: 0.5rem;">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div>${content}</div>
-    `;
-    
-    backdrop.appendChild(modal);
-    document.body.appendChild(backdrop);
-    
-    // Close modal functionality
-    const closeModal = () => {
-        backdrop.style.animation = 'fadeIn 0.3s ease-out reverse';
-        setTimeout(() => {
-            document.body.removeChild(backdrop);
-        }, 300);
-    };
-    
-    document.getElementById('closeModal').addEventListener('click', closeModal);
-    backdrop.addEventListener('click', (e) => {
-        if (e.target === backdrop) {
-            closeModal();
+    closeModal: () => {
+        const modal = document.querySelector('.history-modal');
+        if (modal) {
+            modal.remove();
         }
-    });
-    
-    // ESC key to close
-    const handleEsc = (e) => {
-        if (e.key === 'Escape') {
-            closeModal();
-            document.removeEventListener('keydown', handleEsc);
+    }
+};
+
+// Emergency Guide Handler
+const EmergencyHandler = {
+    show: () => {
+        const emergencyInfo = `
+            <div class="emergency-modal">
+                <div class="modal-overlay" onclick="EmergencyHandler.close()"></div>
+                <div class="modal-content">
+                    <div class="modal-header emergency-header">
+                        <h2><i class="fas fa-exclamation-triangle"></i> Emergency Guidelines</h2>
+                        <button class="close-btn" onclick="EmergencyHandler.close()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="emergency-section">
+                            <h3><i class="fas fa-phone"></i> Emergency Numbers (India)</h3>
+                            <ul>
+                                <li><strong>108</strong> - Emergency Ambulance</li>
+                                <li><strong>102</strong> - Medical Emergency</li>
+                                <li><strong>100</strong> - Police</li>
+                                <li><strong>101</strong> - Fire Department</li>
+                            </ul>
+                        </div>
+
+                        <div class="emergency-section">
+                            <h3><i class="fas fa-heart"></i> When to Seek Immediate Medical Attention</h3>
+                            <ul>
+                                <li>Chest pain or pressure</li>
+                                <li>Difficulty breathing</li>
+                                <li>Severe allergic reactions</li>
+                                <li>High fever (above 103°F/39.4°C)</li>
+                                <li>Severe head injury</li>
+                                <li>Unconsciousness</li>
+                                <li>Severe bleeding</li>
+                                <li>Signs of stroke (FAST: Face drooping, Arm weakness, Speech difficulty, Time to call emergency)</li>
+                            </ul>
+                        </div>
+
+                        <div class="emergency-section">
+                            <h3><i class="fas fa-first-aid"></i> Basic First Aid</h3>
+                            <ul>
+                                <li><strong>For cuts:</strong> Apply pressure with clean cloth</li>
+                                <li><strong>For burns:</strong> Cool with cold water for 10-20 minutes</li>
+                                <li><strong>For choking:</strong> Perform Heimlich maneuver</li>
+                                <li><strong>For unconsciousness:</strong> Check breathing, place in recovery position</li>
+                            </ul>
+                        </div>
+
+                        <div class="emergency-disclaimer">
+                            <p><strong>⚠️ Disclaimer:</strong> This app is for informational purposes only and should not replace professional medical advice. In case of emergency, always call emergency services immediately.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const modalDiv = document.createElement('div');
+        modalDiv.innerHTML = emergencyInfo;
+        modalDiv.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        `;
+
+        // Add emergency-specific styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .emergency-header {
+                background: var(--danger-gradient) !important;
+            }
+            .emergency-section {
+                margin: 1.5rem 0;
+                padding: 1rem;
+                background: var(--bg-card);
+                border-radius: 10px;
+                border-left: 4px solid #ff4b2b;
+            }
+            .emergency-section h3 {
+                color: #ff4b2b;
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            .emergency-section ul {
+                list-style: none;
+                padding: 0;
+            }
+            .emergency-section li {
+                padding: 0.3rem 0;
+                padding-left: 1.5rem;
+                position: relative;
+            }
+            .emergency-section li::before {
+                content: '•';
+                color: #ff4b2b;
+                position: absolute;
+                left: 0;
+                font-weight: bold;
+            }
+            .emergency-disclaimer {
+                background: rgba(255, 75, 43, 0.1);
+                border: 1px solid rgba(255, 75, 43, 0.3);
+                border-radius: 10px;
+                padding: 1rem;
+                margin-top: 1.5rem;
+            }
+        `;
+        document.head.appendChild(style);
+
+        document.body.appendChild(modalDiv);
+    },
+
+    close: () => {
+        const modal = document.querySelector('.emergency-modal');
+        if (modal && modal.parentElement) {
+            modal.parentElement.remove();
         }
-    };
-    document.addEventListener('keydown', handleEsc);
-}
+    }
+};
 
-// Performance optimization - debounce function
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
+// About Handler
+const AboutHandler = {
+    show: () => {
+        const aboutInfo = `
+            <div class="about-modal">
+                <div class="modal-overlay" onclick="AboutHandler.close()"></div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2><i class="fas fa-info-circle"></i> About Medicino</h2>
+                        <button class="close-btn" onclick="AboutHandler.close()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="about-section">
+                            <h3><i class="fas fa-brain"></i> What is Medicino?</h3>
+                            <p>Medicino is an AI-powered medical assistant that helps you understand your symptoms and provides intelligent health recommendations. Our system combines modern medical knowledge with traditional Ayurvedic wisdom to offer comprehensive health guidance.</p>
+                        </div>
 
-// Add smooth scrolling behavior
-document.documentElement.style.scrollBehavior = 'smooth';
+                        <div class="about-section">
+                            <h3><i class="fas fa-cogs"></i> Features</h3>
+                            <ul>
+                                <li><strong>Smart Symptom Analysis:</strong> AI-powered diagnosis with confidence scoring</li>
+                                <li><strong>Dual Treatment Approach:</strong> Modern medicine + Ayurvedic remedies</li>
+                                <li><strong>Medicine Database:</strong> Comprehensive information on medications</li>
+                                <li><strong>Voice Input:</strong> Speak your symptoms naturally</li>
+                                <li><strong>History Tracking:</strong> Keep track of your consultations</li>
+                                <li><strong>Emergency Guidelines:</strong> Quick access to emergency information</li>
+                            </ul>
+                        </div>
 
-// Add loading states for better UX
-window.addEventListener('beforeunload', () => {
-    document.body.style.opacity = '0.7';
-});
+                        <div class="about-section">
+                            <h3><i class="fas fa-shield-alt"></i> Technology Stack</h3>
+                            <ul>
+                                <li><strong>Frontend:</strong> HTML5, CSS3, JavaScript (ES6+)</li>
+                                <li><strong>Backend:</strong> Flask/Django Python Framework</li>
+                                <li><strong>Database:</strong> SQLite with optimized indexing</li>
+                                <li><strong>AI Engine:</strong> Custom symptom matching algorithm</li>
+                                <li><strong>Voice Recognition:</strong> Web Speech API</li>
+                            </ul>
+                        </div>
 
-// Initialize tooltips and help text
-document.addEventListener('DOMContentLoaded', () => {
-    // Add help tooltips
-    const helpElements = document.querySelectorAll('[data-help]');
-    helpElements.forEach(element => {
-        element.addEventListener('mouseenter', (e) => {
-            // Show tooltip (implementation can be expanded)
-            console.log('Help:', e.target.getAttribute('data-help'));
+                        <div class="about-section">
+                            <h3><i class="fas fa-users"></i> How It Works</h3>
+                            <ol>
+                                <li>Enter your symptoms via text or voice input</li>
+                                <li>Our AI analyzes your symptoms against medical database</li>
+                                <li>Receive diagnosis with confidence score</li>
+                                <li>Get both modern medicine and Ayurvedic recommendations</li>
+                                <li>Access detailed medicine information from our database</li>
+                            </ol>
+                        </div>
+
+                        <div class="about-disclaimer">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Important Disclaimer</h4>
+                            <p>Medicino is designed for educational and informational purposes only. It should not be used as a substitute for professional medical advice, diagnosis, or treatment. Always consult with qualified healthcare providers for medical concerns. In case of emergency, contact emergency services immediately.</p>
+                        </div>
+
+                        <div class="about-footer">
+                            <p><strong>Version:</strong> 1.0.0</p>
+                            <p><strong>Last Updated:</strong> ${new Date().toLocaleDateString()}</p>
+                            <p><strong>Support:</strong> For technical support or feedback, please contact our development team.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const modalDiv = document.createElement('div');
+        modalDiv.innerHTML = aboutInfo;
+        modalDiv.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        `;
+
+        // Add about-specific styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .about-section {
+                margin: 1.5rem 0;
+                padding: 1rem;
+                background: var(--bg-card);
+                border-radius: 10px;
+                border-left: 4px solid #667eea;
+            }
+            .about-section h3 {
+                color: #667eea;
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            .about-section ul, .about-section ol {
+                list-style: none;
+                padding: 0;
+            }
+            .about-section li {
+                padding: 0.3rem 0;
+                padding-left: 1.5rem;
+                position: relative;
+                line-height: 1.5;
+            }
+            .about-section ul li::before {
+                content: '✓';
+                color: #667eea;
+                position: absolute;
+                left: 0;
+                font-weight: bold;
+            }
+            .about-section ol {
+                counter-reset: item;
+            }
+            .about-section ol li {
+                counter-increment: item;
+            }
+            .about-section ol li::before {
+                content: counter(item) '.';
+                color: #667eea;
+                position: absolute;
+                left: 0;
+                font-weight: bold;
+            }
+            .about-disclaimer {
+                background: rgba(255, 193, 7, 0.1);
+                border: 1px solid rgba(255, 193, 7, 0.3);
+                border-radius: 10px;
+                padding: 1rem;
+                margin: 1.5rem 0;
+            }
+            .about-disclaimer h4 {
+                color: #ffc107;
+                margin-bottom: 0.5rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            .about-footer {
+                background: var(--bg-card);
+                border-radius: 10px;
+                padding: 1rem;
+                margin-top: 1.5rem;
+                border-top: 2px solid #667eea;
+            }
+            .about-footer p {
+                margin: 0.3rem 0;
+                color: var(--text-secondary);
+            }
+        `;
+        document.head.appendChild(style);
+
+        document.body.appendChild(modalDiv);
+    },
+
+    close: () => {
+        const modal = document.querySelector('.about-modal');
+        if (modal && modal.parentElement) {
+            modal.parentElement.remove();
+        }
+    }
+};
+
+// Backend Switcher (for testing different backends)
+const BackendSwitcher = {
+    switch: (backend) => {
+        if (backend === 'flask' || backend === 'django') {
+            CONFIG.CURRENT_BACKEND = backend;
+            Utils.showNotification(`Switched to ${backend.toUpperCase()} backend`, 'success');
+            console.log(`Backend switched to: ${backend}`);
+        }
+    },
+
+    detectAvailableBackend: async () => {
+        // Try Flask first
+        try {
+            const response = await fetch(`${CONFIG.API_BASE_URL}/medicines`, {
+                method: 'GET',
+                timeout: 3000
+            });
+            if (response.ok) {
+                CONFIG.CURRENT_BACKEND = 'flask';
+                console.log('Flask backend detected and active');
+                return 'flask';
+            }
+        } catch (error) {
+            console.log('Flask backend not available:', error.message);
+        }
+
+        // Try Django
+        try {
+            const response = await fetch(`${CONFIG.DJANGO_BASE_URL}/api/medicines/`, {
+                method: 'GET',
+                timeout: 3000
+            });
+            if (response.ok) {
+                CONFIG.CURRENT_BACKEND = 'django';
+                console.log('Django backend detected and active');
+                return 'django';
+            }
+        } catch (error) {
+            console.log('Django backend not available:', error.message);
+        }
+
+        // No backend available
+        Utils.showNotification('No backend server detected. Please start Flask or Django server.', 'error');
+        return null;
+    }
+};
+
+// Event Listeners Setup
+const EventListeners = {
+    init: () => {
+        // Diagnosis functionality
+        document.getElementById('diagnoseBtn').addEventListener('click', DiagnosisHandler.diagnose);
+        document.getElementById('voiceBtn').addEventListener('click', VoiceService.start);
+        document.getElementById('clearBtn').addEventListener('click', DiagnosisHandler.clear);
+
+        // Medicine functionality
+        document.getElementById('searchMedicineBtn').addEventListener('click', MedicineHandler.search);
+        document.getElementById('showAllBtn').addEventListener('click', MedicineHandler.showAll);
+
+        // Quick actions
+        document.getElementById('historyBtn').addEventListener('click', HistoryHandler.show);
+        document.getElementById('emergencyBtn').addEventListener('click', EmergencyHandler.show);
+        document.getElementById('aboutBtn').addEventListener('click', AboutHandler.show);
+
+        // Enter key support for inputs
+        document.getElementById('symptomsInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                DiagnosisHandler.diagnose();
+            }
         });
-    });
+
+        document.getElementById('medicineInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                MedicineHandler.search();
+            }
+        });
+
+        // Auto-resize textarea
+        const symptomsInput = document.getElementById('symptomsInput');
+        symptomsInput.addEventListener('input', () => {
+            symptomsInput.style.height = 'auto';
+            symptomsInput.style.height = Math.min(symptomsInput.scrollHeight, 200) + 'px';
+        });
+
+        // Voice button state management
+        document.getElementById('voiceBtn').addEventListener('click', () => {
+            if (AppState.isListening) {
+                VoiceService.stop();
+            } else {
+                VoiceService.start();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+Enter for diagnosis
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                DiagnosisHandler.diagnose();
+            }
+
+            // Ctrl+Shift+V for voice input
+            if (e.ctrlKey && e.shiftKey && e.key === 'V') {
+                e.preventDefault();
+                VoiceService.start();
+            }
+
+            // Escape to close modals
+            if (e.key === 'Escape') {
+                HistoryHandler.closeModal();
+                EmergencyHandler.close();
+                AboutHandler.close();
+            }
+        });
+
+        console.log('✅ Event listeners initialized');
+    }
+};
+
+// Application Initialization
+const App = {
+    init: async () => {
+        console.log('🚀 Initializing Medicino Application...');
+
+        try {
+            // Initialize voice recognition
+            VoiceService.init();
+
+            // Setup event listeners
+            EventListeners.init();
+
+            // Detect available backend
+            await BackendSwitcher.detectAvailableBackend();
+
+            // Show welcome message
+            setTimeout(() => {
+                Utils.showNotification('Welcome to Medicino! Your AI-powered medical assistant is ready.', 'success');
+            }, 1000);
+
+            // Add loading animations
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease-in';
+
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+
+            console.log('✅ Medicino Application initialized successfully');
+
+        } catch (error) {
+            console.error('❌ Error initializing application:', error);
+            Utils.showNotification('Application initialization failed. Please refresh the page.', 'error');
+        }
+    },
+
+    // Cleanup function
+    cleanup: () => {
+        // Stop voice recognition if active
+        if (AppState.isListening) {
+            VoiceService.stop();
+        }
+
+        // Clear any timers or intervals
+        console.log('🧹 Application cleanup completed');
+    }
+};
+
+// Performance monitoring
+const Performance = {
+    startTime: Date.now(),
+
+    measureApiCall: (apiName, startTime) => {
+        const endTime = Date.now();
+        const duration = endTime - startTime;
+        console.log(`📊 API Call [${apiName}]: ${duration}ms`);
+
+        if (duration > 5000) {
+            console.warn(`⚠️ Slow API call detected: ${apiName} took ${duration}ms`);
+        }
+    },
+
+    logMemoryUsage: () => {
+        if (performance.memory) {
+            const memory = performance.memory;
+            console.log('💾 Memory Usage:', {
+                used: Math.round(memory.usedJSHeapSize / 1024 / 1024) + ' MB',
+                total: Math.round(memory.totalJSHeapSize / 1024 / 1024) + ' MB',
+                limit: Math.round(memory.jsHeapSizeLimit / 1024 / 1024) + ' MB'
+            });
+        }
+    }
+};
+
+// Error handling
+window.addEventListener('error', (e) => {
+    console.error('Global error:', e.error);
+    Utils.showNotification('An unexpected error occurred. Please try again.', 'error');
 });
+
+window.addEventListener('unhandledrejection', (e) => {
+    console.error('Unhandled promise rejection:', e.reason);
+    Utils.showNotification('A network error occurred. Please check your connection.', 'error');
+});
+
+// Application lifecycle
+window.addEventListener('load', App.init);
+window.addEventListener('beforeunload', App.cleanup);
+
+// Periodic performance monitoring (development only)
+if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    setInterval(() => {
+        Performance.logMemoryUsage();
+    }, 30000); // Every 30 seconds
+}
+
+// Export for testing purposes
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        CONFIG,
+        AppState,
+        Utils,
+        ApiService,
+        VoiceService,
+        DiagnosisHandler,
+        MedicineHandler,
+        HistoryHandler,
+        EmergencyHandler,
+        AboutHandler
+    };
+}
+
+console.log('📋 Medicino JavaScript loaded successfully');

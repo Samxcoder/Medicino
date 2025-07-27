@@ -11,14 +11,14 @@
     --success-gradient: linear-gradient(135deg, #7ea3c4 0%, #1b777c 100%);
     --warning-gradient: linear-gradient(135deg, #2a994f 0%, #52bba8 100%);
     --danger-gradient: linear-gradient(135deg, #a03757 0%, #867930 100%);
-    
+
     --bg-primary: #0f0f23;
     --bg-secondary: #1a1a3e;
     --bg-card: rgba(255, 255, 255, 0.05);
     --text-primary: #ffffff;
     --text-secondary: #b8b9db;
     --border-color: rgba(255, 255, 255, 0.1);
-    
+
     --shadow-glass: 0 8px 32px rgba(31, 38, 135, 0.37);
     --shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.3);
 }
@@ -49,7 +49,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: 
+    background:
         radial-gradient(circle at 20% 80%, #667eea 0%, transparent 50%),
         radial-gradient(circle at 80% 20%, #764ba2 0%, transparent 50%),
         radial-gradient(circle at 40% 40%, #f093fb 0%, transparent 50%);
@@ -468,16 +468,16 @@ body {
     .container {
         padding: 0 1rem;
     }
-    
+
     .glass-card {
         padding: 1.5rem;
         margin: 1rem 0;
     }
-    
+
     .header h1 {
         font-size: 2.5rem;
     }
-    
+
     .btn {
         padding: 0.8rem 1.5rem;
         font-size: 0.9rem;
