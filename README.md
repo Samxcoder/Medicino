@@ -8,7 +8,8 @@ A comprehensive web application for symptom diagnosis and medicine information u
 - **Medicine Database**: Comprehensive medicine information with pricing and dosage
 - **Ayurvedic Remedies**: Traditional treatment suggestions alongside modern medicine
 - **Voice Input Support**: Speech-to-text for symptom input
-- **Diagnosis History**: Track past diagnoses and treatments
+- **User Authentication**: Secure registration and login system
+- **Personalized History**: Track past diagnoses and treatments per user
 - **RESTful API**: Full API support for mobile apps and integrations
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
 
@@ -18,6 +19,7 @@ A comprehensive web application for symptom diagnosis and medicine information u
 - **Flask** or **Django** (Python web frameworks)
 - **SQLite** (Database)
 - **Flask-CORS** / **Django-CORS-Headers** (Cross-origin requests)
+- **Flask-Login** (User authentication)
 - **REST API** architecture
 
 ### Frontend
@@ -27,6 +29,7 @@ A comprehensive web application for symptom diagnosis and medicine information u
 - **Web Speech API** for voice input
 
 ### Database Schema
+- **Users Table**: User authentication and profiles
 - **Medicines Table**: Medicine information and pricing
 - **Symptoms Database**: Condition-symptom mappings
 - **Diagnosis History**: User diagnosis tracking
@@ -61,13 +64,17 @@ A comprehensive web application for symptom diagnosis and medicine information u
 
 3. **Install Dependencies**
    ```bash
-   pip install Flask==2.3.3
-   pip install Flask-CORS==4.0.0
+   pip install -r requirements.txt
    ```
 
 4. **Setup Database**
    ```bash
    python database_setup.py
+   ```
+   
+   **For Existing Databases**: If you have an existing database and want to add authentication:
+   ```bash
+   python add_users_table.py
    ```
 
 5. **Run the Application**
@@ -147,7 +154,12 @@ medicino-app/
 | POST | `/api/diagnose` | Symptom diagnosis |
 | GET | `/api/medicine/<name>` | Medicine information |
 | GET | `/api/medicines` | List all medicines |
-| GET | `/api/history` | Diagnosis history |
+| GET | `/api/history` | User's diagnosis history |
+| GET | `/login` | Login page |
+| POST | `/login` | Login form submission |
+| GET | `/register` | Registration page |
+| POST | `/register` | Registration form submission |
+| GET | `/logout` | Logout user |
 
 ### Sample API Usage
 
@@ -214,17 +226,30 @@ CREATE TABLE symptoms_database (
 );
 ```
 
+### Users Table
+```sql
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
 ### Diagnosis History Table
 ```sql
 CREATE TABLE diagnosis_history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
     symptoms TEXT NOT NULL,
     diagnosed_condition TEXT,
     ayurvedic_remedy TEXT,
     medicine_suggestion TEXT,
     confidence_score REAL,
     user_feedback TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id)
 );
 ```
 
@@ -260,7 +285,12 @@ def diagnose_symptoms(symptoms_text):
 
 ### Web Interface Usage
 
-1. **Symptom Diagnosis**:
+1. **User Registration/Login**:
+   - Click "Register" to create a new account
+   - Or click "Login" if you already have an account
+   - All features require authentication
+
+2. **Symptom Diagnosis**:
    - Enter symptoms: "fever, sore throat, body ache"
    - Click "Diagnose Symptoms"
    - View AI-generated diagnosis with confidence score
@@ -292,6 +322,8 @@ def diagnose_symptoms(symptoms_text):
 
 ## 🔒 Security Features
 
+- **User Authentication**: Secure registration and login system with password hashing
+- **Session Management**: Flask-Login handles user sessions securely
 - **Input Validation**: All user inputs are sanitized and validated
 - **SQL Injection Prevention**: Uses parameterized queries
 - **CORS Configuration**: Properly configured cross-origin requests

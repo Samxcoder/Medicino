@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicino - AI-Powered Medical Assistant</title>
+    <link rel="icon" href="static/logo.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/style.css">
+    <style>
+        .landing-container {
+            min-height: 100vh;
+            width: 100%;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .landing-content {
+            width: 100%;
+            max-width: 100%;
+            position: relative;
+            z-index: 1;
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-section {
+            margin-bottom: 3rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        .auth-section {
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .auth-btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .auth-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(139, 69, 19, 0.4);
+        }
+
+        .register-btn {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            box-shadow: 0 8px 25px rgba(139, 69, 19, 0.1);
+        }
+
+        .register-btn:hover {
+            background: var(--primary-gradient);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(139, 69, 19, 0.3);
+        }
+
+        .logo-section {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 4rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: inline-block;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.4rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        .description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            line-height: 1.8;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+            width: 100%;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-glass);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-gradient);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--text-primary);
+        }
+
+        .feature-description {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+            padding: 2rem;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-glass);
+            width: 100%;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .cta-section {
+            margin-top: 3rem;
+            padding: 3rem;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-glass);
+            text-align: center;
+            width: 100%;
+        }
+
+        .cta-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .cta-text {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .flash-messages {
+            margin-bottom: 2rem;
+        }
+
+        .flash-message {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: slideInDown 0.3s ease-out;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .flash-error {
+            background: rgba(220, 20, 60, 0.1);
+            color: #DC143C;
+            border: 1px solid rgba(220, 20, 60, 0.2);
+        }
+
+        .flash-success {
+            background: rgba(34, 139, 34, 0.1);
+            color: #228B22;
+            border: 1px solid rgba(34, 139, 34, 0.2);
+        }
+
+        .flash-info {
+            background: rgba(139, 69, 19, 0.1);
+            color: #8B4513;
+            border: 1px solid rgba(139, 69, 19, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .landing-container {
+                padding: 1rem;
+            }
+
+            .title {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1.2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .auth-buttons {
+                justify-content: center;
+            }
+
+            .auth-btn {
+                width: 100%;
+                max-width: 200px;
+                justify-content: center;
+            }
+
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+                padding: 1.5rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .cta-section {
+                padding: 2rem;
+            }
+
+            .cta-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .landing-container {
+                padding: 0.5rem;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .logo {
+                font-size: 3rem;
+            }
+
+            .stats-section {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    
+    <div class="landing-container">
+        <div class="landing-content">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">
+                                <i class="fas fa-{% if category == 'error' %}exclamation-circle{% elif category == 'success' %}check-circle{% else %}info-circle{% endif %}"></i>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- Hero Section -->
+            <div class="hero-section">
+                <!-- Authentication Buttons -->
+                <div class="auth-section">
+                    <div class="auth-buttons">
+                        <a href="{{ url_for('login') }}" class="auth-btn login-btn">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Login
+                        </a>
+                        <a href="{{ url_for('register') }}" class="auth-btn register-btn">
+                            <i class="fas fa-user-plus"></i>
+                            Register
+                        </a>
+                    </div>
+                </div>
+
+                <div class="logo-section">
+                    <div class="logo">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h1 class="title">MEDICINO</h1>
+                    <p class="subtitle">AI-Powered Medical Assistant for Smart Healthcare</p>
+                </div>
+
+                <p class="description">
+                    Welcome to Medicino, your intelligent healthcare companion. Our advanced AI system provides 
+                    personalized symptom analysis, Ayurvedic remedies, and medicine recommendations to help you 
+                    make informed health decisions. Experience the future of healthcare with cutting-edge technology 
+                    and traditional wisdom combined.
+                </p>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-brain feature-icon"></i>
+                    <h3 class="feature-title">AI Diagnosis</h3>
+                    <p class="feature-description">
+                        Advanced symptom analysis using machine learning algorithms to provide accurate 
+                        preliminary assessments and health insights.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-leaf feature-icon"></i>
+                    <h3 class="feature-title">Ayurvedic Remedies</h3>
+                    <p class="feature-description">
+                        Traditional healing methods combined with modern technology for holistic 
+                        wellness and natural treatment approaches.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-pills feature-icon"></i>
+                    <h3 class="feature-title">Medicine Database</h3>
+                    <p class="feature-description">
+                        Comprehensive information about medicines, their effects, dosages, and 
+                        contraindications for informed decision-making.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-history feature-icon"></i>
+                    <h3 class="feature-title">Health History</h3>
+                    <p class="feature-description">
+                        Track your diagnosis history and health journey with detailed records 
+                        and progress monitoring.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="stats-section">
+                <div class="stat-item">
+                    <span class="stat-number">10K+</span>
+                    <span class="stat-label">Diagnoses</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">500+</span>
+                    <span class="stat-label">Medicines</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">50+</span>
+                    <span class="stat-label">Conditions</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">99%</span>
+                    <span class="stat-label">Accuracy</span>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="cta-section">
+                <h2 class="cta-title">Ready to Start Your Health Journey?</h2>
+                <p class="cta-text">
+                    Join thousands of users who trust Medicino for their healthcare needs. 
+                    Get started today with a free account and experience the future of medical assistance.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
