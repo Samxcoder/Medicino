@@ -9,7 +9,7 @@ import os
 
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-here'  # Change this to a secure secret key
+app.secret_key = '773b8a8453970d5f38c0a8e3e49b85f9'  # Change this to a secure secret key
 
 # Flask-Login setup
 login_manager = LoginManager()
