@@ -6,21 +6,21 @@
 }
 
 :root {
-    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --secondary-gradient: linear-gradient(135deg, #a75caf 0%, #ac2f3f 100%);
-    --success-gradient: linear-gradient(135deg, #7ea3c4 0%, #1b777c 100%);
-    --warning-gradient: linear-gradient(135deg, #2a994f 0%, #52bba8 100%);
-    --danger-gradient: linear-gradient(135deg, #a03757 0%, #867930 100%);
+    --primary-gradient: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    --secondary-gradient: linear-gradient(135deg, #CD853F 0%, #DEB887 100%);
+    --success-gradient: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+    --warning-gradient: linear-gradient(135deg, #FF8C00 0%, #FFA500 100%);
+    --danger-gradient: linear-gradient(135deg, #DC143C 0%, #FF6347 100%);
 
-    --bg-primary: #0f0f23;
-    --bg-secondary: #1a1a3e;
-    --bg-card: rgba(255, 255, 255, 0.05);
-    --text-primary: #ffffff;
-    --text-secondary: #b8b9db;
-    --border-color: rgba(255, 255, 255, 0.1);
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F8F8F8;
+    --bg-card: rgba(255, 255, 255, 0.9);
+    --text-primary: #2F1B14;
+    --text-secondary: #8B4513;
+    --border-color: rgba(139, 69, 19, 0.2);
 
-    --shadow-glass: 0 8px 32px rgba(31, 38, 135, 0.37);
-    --shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.3);
+    --shadow-glass: 0 8px 32px rgba(139, 69, 19, 0.1);
+    --shadow-hover: 0 15px 35px rgba(139, 69, 19, 0.2);
 }
 
 body {
@@ -29,6 +29,8 @@ body {
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
+    font-size: 16px;
+    line-height: 1.6;
 }
 
 /* Animated Background */
@@ -39,7 +41,7 @@ body {
     width: 100%;
     height: 100%;
     z-index: -1;
-    opacity: 0.1;
+    opacity: 0.05;
 }
 
 .bg-animation::before {
@@ -50,9 +52,9 @@ body {
     right: 0;
     bottom: 0;
     background:
-        radial-gradient(circle at 20% 80%, #667eea 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, #764ba2 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, #f093fb 0%, transparent 50%);
+        radial-gradient(circle at 20% 80%, #8B4513 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, #A0522D 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, #CD853F 0%, transparent 50%);
     animation: bgMove 20s ease-in-out infinite;
 }
 
@@ -64,8 +66,7 @@ body {
 
 /* Header */
 .header {
-    padding: 2rem 0;
-    text-align: center;
+    padding: 1.5rem 0;
     position: relative;
 }
 
@@ -81,22 +82,139 @@ body {
     border-radius: 1px;
 }
 
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header-left {
+    text-align: left;
+    flex: 1;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 .header h1 {
-    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-size: 2.5rem;
     font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
     background: var(--primary-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: 1rem;
-    animation: slideInDown 1s ease-out;
 }
 
 .header .subtitle {
-    font-size: 1.2rem;
+    font-size: 1rem;
     color: var(--text-secondary);
-    font-weight: 300;
-    animation: slideInUp 1s ease-out 0.3s both;
+    font-weight: 400;
+}
+
+/* Authentication Styles */
+.auth-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.auth-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-height: 44px; /* Touch-friendly minimum height */
+}
+
+.login-btn {
+    background: var(--primary-gradient);
+    color: white;
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
+}
+
+.register-btn {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+}
+
+.register-btn:hover {
+    background: var(--primary-gradient);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
+}
+
+.logout-btn {
+    background: var(--danger-gradient);
+    color: white;
+}
+
+.logout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(220, 20, 60, 0.3);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.welcome-text {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Flash Messages */
+.flash-messages {
+    margin-bottom: 2rem;
+}
+
+.flash-message {
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: slideInDown 0.3s ease-out;
+}
+
+.flash-error {
+    background: rgba(220, 20, 60, 0.1);
+    color: #DC143C;
+    border: 1px solid rgba(220, 20, 60, 0.2);
+}
+
+.flash-success {
+    background: rgba(34, 139, 34, 0.1);
+    color: #228B22;
+    border: 1px solid rgba(34, 139, 34, 0.2);
+}
+
+.flash-info {
+    background: rgba(139, 69, 19, 0.1);
+    color: #8B4513;
+    border: 1px solid rgba(139, 69, 19, 0.2);
 }
 
 /* Container */
@@ -104,17 +222,19 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 2rem;
+    position: relative;
+    z-index: 1;
 }
 
 /* Glass Cards */
 .glass-card {
     background: var(--bg-card);
     backdrop-filter: blur(20px);
-    border: 1px solid var(--border-color);
     border-radius: 20px;
-    padding: 2rem;
-    margin: 2rem 0;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
     box-shadow: var(--shadow-glass);
+    border: 1px solid var(--border-color);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -124,92 +244,90 @@ body {
     content: '';
     position: absolute;
     top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-    transition: left 0.5s;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--primary-gradient);
 }
 
 .glass-card:hover::before {
-    left: 100%;
+    height: 5px;
 }
 
 .glass-card:hover {
     transform: translateY(-5px);
     box-shadow: var(--shadow-hover);
-    border-color: rgba(255, 255, 255, 0.3);
 }
 
 .card-title {
     font-size: 1.8rem;
-    font-weight: 600;
+    font-weight: 700;
+    color: var(--text-primary);
     margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.8rem;
 }
 
 .card-title i {
-    font-size: 2rem;
-    background: var(--secondary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
 }
 
 /* Input Styles */
 .input-group {
     margin-bottom: 1.5rem;
-    position: relative;
 }
 
 .input-group label {
     display: block;
     margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: var(--text-secondary);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1rem;
 }
 
 .modern-input {
     width: 100%;
-    padding: 1rem 1.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid transparent;
-    border-radius: 15px;
+    padding: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--bg-primary);
     color: var(--text-primary);
     font-size: 1rem;
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
+    font-family: inherit;
+    min-height: 44px; /* Touch-friendly minimum height */
 }
 
 .modern-input:focus {
     outline: none;
-    border-color: #667eea;
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+    border-color: var(--text-secondary);
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
 }
 
 .modern-input::placeholder {
     color: var(--text-secondary);
+    opacity: 0.7;
 }
 
 /* Buttons */
 .btn {
-    padding: 1rem 2rem;
+    padding: 0.75rem 1.5rem;
     border: none;
-    border-radius: 15px;
+    border-radius: 12px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    margin: 0.5rem;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    min-height: 44px; /* Touch-friendly minimum height */
+    min-width: 44px; /* Touch-friendly minimum width */
 }
 
 .btn-primary {
@@ -218,8 +336,9 @@ body {
 }
 
 .btn-secondary {
-    background: var(--secondary-gradient);
-    color: white;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
 }
 
 .btn-success {
@@ -229,7 +348,7 @@ body {
 
 .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
 }
 
 .btn:active {
@@ -243,7 +362,7 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
     transition: left 0.5s;
 }
 
@@ -254,7 +373,7 @@ body {
 /* Voice Button Special Effect */
 .btn-voice {
     background: var(--warning-gradient);
-    position: relative;
+    color: white;
 }
 
 .btn-voice.listening {
@@ -262,55 +381,59 @@ body {
 }
 
 @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(67, 233, 123, 0.7); }
-    70% { box-shadow: 0 0 0 20px rgba(67, 233, 123, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(67, 233, 123, 0); }
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
 /* Results Section */
 .results-card {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-    border: 2px solid rgba(102, 126, 234, 0.3);
-    animation: slideInUp 0.5s ease-out;
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-top: 2rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-glass);
 }
 
 .result-item {
-    margin: 1.5rem 0;
+    margin-bottom: 1.5rem;
     padding: 1rem;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 10px;
-    border-left: 4px solid #667eea;
+    background: var(--bg-primary);
+    border-radius: 12px;
+    border-left: 4px solid var(--text-secondary);
 }
 
 .result-label {
     font-weight: 600;
-    color: #667eea;
+    color: var(--text-primary);
     margin-bottom: 0.5rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    font-size: 1.1rem;
 }
 
 .result-value {
-    color: var(--text-primary);
+    color: var(--text-secondary);
     line-height: 1.6;
+    font-size: 1rem;
 }
 
 /* Confidence Score */
 .confidence-bar {
     width: 100%;
     height: 8px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--bg-secondary);
     border-radius: 4px;
     overflow: hidden;
-    margin-top: 1rem;
+    margin-top: 0.5rem;
 }
 
 .confidence-fill {
     height: 100%;
-    background: var(--success-gradient);
+    background: var(--primary-gradient);
     border-radius: 4px;
-    transition: width 1s ease-out;
+    transition: width 1s ease;
     position: relative;
 }
 
@@ -321,7 +444,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
     animation: shimmer 2s infinite;
 }
 
@@ -332,97 +455,95 @@ body {
 
 /* Severity Badges */
 .severity-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
     border-radius: 20px;
+    font-size: 0.8rem;
     font-weight: 600;
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .severity-mild {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    background: var(--success-gradient);
     color: white;
 }
 
 .severity-moderate {
-    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    background: var(--warning-gradient);
     color: white;
 }
 
 .severity-severe {
-    background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+    background: var(--danger-gradient);
     color: white;
 }
 
 /* Medicine Cards */
 .medicine-card {
-    background: linear-gradient(135deg, rgba(240, 147, 251, 0.1) 0%, rgba(245, 87, 108, 0.1) 100%);
-    border: 2px solid rgba(240, 147, 251, 0.3);
-    border-radius: 15px;
+    background: var(--bg-card);
+    border-radius: 12px;
     padding: 1.5rem;
-    margin: 1rem 0;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
     transition: all 0.3s ease;
 }
 
 .medicine-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(240, 147, 251, 0.2);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
 }
 
 .medicine-name {
-    font-size: 1.5rem;
-    font-weight: 700;
-    background: var(--secondary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 1rem;
-}
-
-.medicine-detail {
-    margin: 0.8rem 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     gap: 0.5rem;
 }
 
+.medicine-detail {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+}
+
 .medicine-detail strong {
-    color: #f093fb;
-    min-width: 120px;
+    color: var(--text-primary);
 }
 
 .price-tag {
-    background: var(--success-gradient);
+    display: inline-block;
+    background: var(--primary-gradient);
     color: white;
-    padding: 0.3rem 0.8rem;
-    border-radius: 15px;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
     font-weight: 600;
-    font-size: 1.1rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
+    margin-top: 0.5rem;
 }
 
 /* Loading Animations */
 .loader {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 3rem;
     flex-direction: column;
-    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
 }
 
 .spinner {
-    width: 50px;
-    height: 50px;
-    border: 4px solid rgba(102, 126, 234, 0.3);
-    border-top: 4px solid #667eea;
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--border-color);
+    border-top: 4px solid var(--text-secondary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
 }
 
 @keyframes spin {
@@ -439,7 +560,7 @@ body {
 @keyframes slideInDown {
     from {
         opacity: 0;
-        transform: translateY(-50px);
+        transform: translateY(-20px);
     }
     to {
         opacity: 1;
@@ -450,7 +571,7 @@ body {
 @keyframes slideInUp {
     from {
         opacity: 0;
-        transform: translateY(50px);
+        transform: translateY(20px);
     }
     to {
         opacity: 1;
@@ -459,44 +580,904 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
-/* Responsive Design */
+/* Modal Styles */
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border-radius: 20px;
+    max-width: 800px;
+    max-height: 90vh;
+    width: 90%;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-glass);
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--primary-gradient);
+    color: white;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background 0.3s ease;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Emergency Modal Styles */
+.emergency-header {
+    background: var(--danger-gradient) !important;
+}
+
+.emergency-section {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: var(--bg-card);
+    border-radius: 10px;
+    border-left: 4px solid #DC143C;
+}
+
+.emergency-section h3 {
+    color: #DC143C;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.emergency-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.emergency-section li {
+    padding: 0.3rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.emergency-section li::before {
+    content: '•';
+    color: #DC143C;
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+.emergency-disclaimer {
+    background: rgba(220, 20, 60, 0.1);
+    border: 1px solid rgba(220, 20, 60, 0.3);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 1.5rem;
+}
+
+/* About Modal Styles */
+.about-section {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: var(--bg-card);
+    border-radius: 10px;
+    border-left: 4px solid var(--text-secondary);
+}
+
+.about-section h3 {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.about-section ul, .about-section ol {
+    list-style: none;
+    padding: 0;
+}
+
+.about-section li {
+    padding: 0.3rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    line-height: 1.5;
+}
+
+.about-section ul li::before {
+    content: '✓';
+    color: var(--text-secondary);
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+.about-section ol {
+    counter-reset: item;
+}
+
+.about-section ol li {
+    counter-increment: item;
+}
+
+.about-section ol li::before {
+    content: counter(item) '.';
+    color: var(--text-secondary);
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+.about-disclaimer {
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    border-radius: 10px;
+    padding: 1rem;
+    margin: 1.5rem 0;
+}
+
+.about-disclaimer h4 {
+    color: #FF8C00;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.about-footer {
+    background: var(--bg-card);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 1.5rem;
+    border-top: 2px solid var(--text-secondary);
+}
+
+.about-footer p {
+    margin: 0.3rem 0;
+    color: var(--text-secondary);
+}
+
+/* History Modal Styles */
+.history-item {
+    background: var(--bg-card);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--primary-gradient);
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.history-date {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.history-content p {
+    margin: 0.5rem 0;
+    line-height: 1.5;
+}
+
+/* Responsive Design - Mobile First Approach */
+@media (max-width: 1200px) {
+    .container {
+        max-width: 100%;
+        padding: 0 1.5rem;
+    }
+}
+
 @media (max-width: 768px) {
+    /* Mobile Typography */
+    body {
+        font-size: 14px;
+    }
+
+    /* Mobile Header */
+    .header {
+        padding: 1rem 0;
+    }
+
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .header-left {
+        text-align: center;
+    }
+
+    .header h1 {
+        font-size: 2rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .header .subtitle {
+        font-size: 0.9rem;
+    }
+
+    /* Mobile Authentication */
+    .auth-buttons {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .auth-btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
+        min-height: 40px;
+    }
+
+    .user-info {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+
+    .welcome-text {
+        font-size: 0.9rem;
+    }
+
+    /* Mobile Container */
     .container {
         padding: 0 1rem;
     }
 
+    /* Mobile Glass Cards */
     .glass-card {
         padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-radius: 16px;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+
+    .card-title i {
+        font-size: 1.3rem;
+    }
+
+    /* Mobile Inputs */
+    .input-group {
+        margin-bottom: 1rem;
+    }
+
+    .input-group label {
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .modern-input {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+        min-height: 40px;
+    }
+
+    /* Mobile Buttons */
+    .btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+        min-height: 40px;
+        min-width: 40px;
+        justify-content: center;
+    }
+
+    /* Mobile Results */
+    .results-card {
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .result-item {
+        padding: 0.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .result-label {
+        font-size: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+
+    .result-value {
+        font-size: 0.9rem;
+    }
+
+    /* Mobile Medicine Cards */
+    .medicine-card {
+        padding: 1rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .medicine-name {
+        font-size: 1.1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+
+    .medicine-detail {
+        font-size: 0.85rem;
+    }
+
+    /* Mobile Modals */
+    .modal-content {
+        width: 95%;
+        max-height: 95vh;
+        margin: 1rem;
+    }
+
+    .modal-header {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+
+    .modal-header h2 {
+        font-size: 1.3rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+        max-height: 80vh;
+    }
+
+    .close-btn {
+        font-size: 1.2rem;
+        min-width: 40px;
+        min-height: 40px;
+    }
+
+    /* Mobile Emergency Sections */
+    .emergency-section {
         margin: 1rem 0;
+        padding: 0.8rem;
+    }
+
+    .emergency-section h3 {
+        font-size: 1.1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+
+    .emergency-section li {
+        padding: 0.2rem 0;
+        padding-left: 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    /* Mobile About Sections */
+    .about-section {
+        margin: 1rem 0;
+        padding: 0.8rem;
+    }
+
+    .about-section h3 {
+        font-size: 1.1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+
+    .about-section li {
+        padding: 0.2rem 0;
+        padding-left: 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    /* Mobile History */
+    .history-item {
+        padding: 0.8rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .history-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+
+    .history-date {
+        font-size: 0.8rem;
+    }
+
+    .history-content p {
+        font-size: 0.9rem;
+        margin: 0.3rem 0;
+    }
+
+    /* Mobile Flash Messages */
+    .flash-message {
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.3rem;
+    }
+
+    /* Mobile Loading */
+    .loader {
+        padding: 1.5rem;
+    }
+
+    .spinner {
+        width: 35px;
+        height: 35px;
+    }
+
+    .loader-text {
+        font-size: 0.9rem;
+    }
+
+    /* Mobile Severity Badges */
+    .severity-badge {
+        padding: 0.2rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    /* Mobile Price Tags */
+    .price-tag {
+        padding: 0.2rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    /* Mobile Confidence Bar */
+    .confidence-bar {
+        height: 6px;
+    }
+
+    /* Mobile Text Utilities */
+    .text-center {
+        text-align: center;
+    }
+
+    .mb-1 { margin-bottom: 0.8rem; }
+    .mb-2 { margin-bottom: 1.5rem; }
+    .mt-1 { margin-top: 0.8rem; }
+    .mt-2 { margin-top: 1.5rem; }
+}
+
+@media (max-width: 480px) {
+    /* Extra Small Mobile Devices */
+    body {
+        font-size: 13px;
+    }
+
+    .container {
+        padding: 0 0.8rem;
     }
 
     .header h1 {
-        font-size: 2.5rem;
+        font-size: 1.8rem;
+    }
+
+    .header .subtitle {
+        font-size: 0.8rem;
+    }
+
+    .glass-card {
+        padding: 1.2rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .card-title {
+        font-size: 1.3rem;
     }
 
     .btn {
-        padding: 0.8rem 1.5rem;
-        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        min-height: 36px;
+        min-width: 36px;
+    }
+
+    .modern-input {
+        padding: 0.7rem;
+        font-size: 0.85rem;
+        min-height: 36px;
+    }
+
+    .results-card {
+        padding: 1.2rem;
+    }
+
+    .result-item {
+        padding: 0.7rem;
+    }
+
+    .medicine-card {
+        padding: 0.8rem;
+    }
+
+    .modal-content {
+        width: 98%;
+        margin: 0.5rem;
+    }
+
+    .modal-header {
+        padding: 0.8rem;
+    }
+
+    .modal-header h2 {
+        font-size: 1.2rem;
+    }
+
+    .modal-body {
+        padding: 0.8rem;
+    }
+
+    .emergency-section,
+    .about-section {
+        padding: 0.7rem;
+    }
+
+    .emergency-section h3,
+    .about-section h3 {
+        font-size: 1rem;
+    }
+
+    .emergency-section li,
+    .about-section li {
+        font-size: 0.85rem;
+        padding-left: 1rem;
+    }
+
+    .history-item {
+        padding: 0.7rem;
+    }
+
+    .flash-message {
+        padding: 0.7rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .auth-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+        min-height: 36px;
+    }
+
+    .welcome-text {
+        font-size: 0.85rem;
     }
 }
 
-/* Utility Classes */
-.hidden {
-    display: none !important;
+@media (max-width: 360px) {
+    /* Very Small Mobile Devices */
+    body {
+        font-size: 12px;
+    }
+
+    .container {
+        padding: 0 0.5rem;
+    }
+
+    .header h1 {
+        font-size: 1.6rem;
+    }
+
+    .glass-card {
+        padding: 1rem;
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+    }
+
+    .btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+        min-height: 32px;
+        min-width: 32px;
+    }
+
+    .modern-input {
+        padding: 0.6rem;
+        font-size: 0.8rem;
+        min-height: 32px;
+    }
+
+    .modal-content {
+        width: 99%;
+        margin: 0.3rem;
+    }
+
+    .modal-header {
+        padding: 0.6rem;
+    }
+
+    .modal-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .modal-body {
+        padding: 0.6rem;
+    }
 }
 
-.text-center {
-    text-align: center;
+/* Landscape Mobile Optimization */
+@media (max-width: 768px) and (orientation: landscape) {
+    .header {
+        padding: 0.8rem 0;
+    }
+
+    .header-content {
+        flex-direction: row;
+        text-align: left;
+    }
+
+    .header-left {
+        text-align: left;
+    }
+
+    .glass-card {
+        padding: 1.2rem;
+    }
+
+    .modal-content {
+        max-height: 85vh;
+    }
+
+    .modal-body {
+        max-height: 60vh;
+    }
 }
 
-.mb-1 { margin-bottom: 1rem; }
-.mb-2 { margin-bottom: 2rem; }
-.mt-1 { margin-top: 1rem; }
-.mt-2 { margin-top: 2rem; }
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    /* Remove hover effects on touch devices */
+    .btn:hover,
+    .glass-card:hover,
+    .medicine-card:hover,
+    .auth-btn:hover {
+        transform: none;
+        box-shadow: var(--shadow-glass);
+    }
+
+    /* Increase touch targets */
+    .btn,
+    .auth-btn,
+    .close-btn {
+        min-height: 48px;
+        min-width: 48px;
+    }
+
+    .modern-input {
+        min-height: 48px;
+    }
+
+    /* Improve scrolling on touch devices */
+    .modal-body {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Better touch feedback */
+    .btn:active,
+    .auth-btn:active,
+    .close-btn:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+    }
+
+    /* Prevent text selection on buttons */
+    .btn,
+    .auth-btn,
+    .close-btn {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+}
+
+/* High DPI Display Support */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .bg-animation::before {
+        background-size: 200% 200%;
+    }
+}
+
+/* Mobile Navigation Improvements */
+@media (max-width: 768px) {
+    /* Improve button spacing on mobile */
+    .text-center {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    /* Better form layout on mobile */
+    .input-group {
+        margin-bottom: 1.2rem;
+    }
+
+    /* Improve modal scrolling */
+    .modal-body {
+        padding-bottom: 2rem;
+    }
+
+    /* Better flash message positioning */
+    .flash-message {
+        margin: 0 0.5rem 0.5rem 0.5rem;
+        border-radius: 8px;
+    }
+
+    /* Improve medicine card layout */
+    .medicine-card {
+        margin-bottom: 1rem;
+    }
+
+    .medicine-detail {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    .medicine-detail strong {
+        margin-bottom: 0.2rem;
+    }
+
+    /* Better results layout */
+    .result-item {
+        margin-bottom: 1.2rem;
+    }
+
+    .result-label {
+        margin-bottom: 0.5rem;
+    }
+
+    /* Improve confidence bar visibility */
+    .confidence-bar {
+        margin-top: 0.8rem;
+    }
+
+    /* Better loading states */
+    .loader {
+        min-height: 120px;
+    }
+
+    /* Improve button groups */
+    .btn + .btn {
+        margin-left: 0.5rem;
+    }
+}
+
+/* Extra Small Mobile Optimizations */
+@media (max-width: 480px) {
+    /* Stack buttons vertically on very small screens */
+    .text-center {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .btn + .btn {
+        margin-left: 0;
+        margin-top: 0.5rem;
+    }
+
+    /* Improve modal usability */
+    .modal-content {
+        margin: 0.5rem;
+        border-radius: 16px;
+    }
+
+    .modal-header {
+        border-radius: 16px 16px 0 0;
+    }
+
+    /* Better text readability */
+    .result-value,
+    .medicine-detail {
+        line-height: 1.4;
+    }
+
+    /* Improve form inputs */
+    .modern-input {
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+
+    /* Better spacing for small screens */
+    .glass-card {
+        margin-bottom: 1rem;
+    }
+
+    .card-title {
+        margin-bottom: 0.8rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .bg-animation,
+    .btn,
+    .auth-btn,
+    .close-btn {
+        display: none !important;
+    }
+
+    .glass-card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        background: white;
+    }
+
+    .modal-content {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        background: white;
+    }
+}
+
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Dark Mode Support (if needed in future) */
+@media (prefers-color-scheme: dark) {
+    /* Future dark mode styles can be added here */
+}
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
@@ -508,10 +1489,24 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--primary-gradient);
+    background: var(--text-secondary);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--secondary-gradient);
+    background: var(--text-primary);
 }
+
+/* Utility Classes */
+.hidden {
+    display: none;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mb-1 { margin-bottom: 1rem; }
+.mb-2 { margin-bottom: 2rem; }
+.mt-1 { margin-top: 1rem; }
+.mt-2 { margin-top: 2rem; }

@@ -608,79 +608,7 @@ const HistoryHandler = {
 
         document.body.appendChild(modal);
 
-        // Add CSS for modal components
-        const style = document.createElement('style');
-        style.textContent = `
-            .modal-overlay {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.8);
-                backdrop-filter: blur(5px);
-            }
-            .modal-content {
-                background: var(--bg-secondary);
-                border-radius: 20px;
-                max-width: 800px;
-                max-height: 90vh;
-                width: 90%;
-                border: 1px solid var(--border-color);
-                box-shadow: var(--shadow-glass);
-                position: relative;
-                overflow: hidden;
-            }
-            .modal-header {
-                padding: 1.5rem;
-                border-bottom: 1px solid var(--border-color);
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                background: var(--primary-gradient);
-                color: white;
-            }
-            .modal-body {
-                padding: 1.5rem;
-                max-height: 70vh;
-                overflow-y: auto;
-            }
-            .close-btn {
-                background: none;
-                border: none;
-                color: white;
-                font-size: 1.5rem;
-                cursor: pointer;
-                padding: 0.5rem;
-                border-radius: 50%;
-                transition: background 0.3s ease;
-            }
-            .close-btn:hover {
-                background: rgba(255, 255, 255, 0.2);
-            }
-            .history-item {
-                background: var(--bg-card);
-                border-radius: 10px;
-                padding: 1rem;
-                margin-bottom: 1rem;
-                border-left: 4px solid var(--primary-gradient);
-            }
-            .history-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 0.5rem;
-            }
-            .history-date {
-                color: var(--text-secondary);
-                font-size: 0.9rem;
-            }
-            .history-content p {
-                margin: 0.5rem 0;
-                line-height: 1.5;
-            }
-        `;
-        document.head.appendChild(style);
+        // Modal styles are now handled by CSS
 
         Utils.showNotification(`Loaded ${history.length} diagnosis records`, 'success');
     },
@@ -763,51 +691,7 @@ const EmergencyHandler = {
             justify-content: center;
         `;
 
-        // Add emergency-specific styles
-        const style = document.createElement('style');
-        style.textContent = `
-            .emergency-header {
-                background: var(--danger-gradient) !important;
-            }
-            .emergency-section {
-                margin: 1.5rem 0;
-                padding: 1rem;
-                background: var(--bg-card);
-                border-radius: 10px;
-                border-left: 4px solid #ff4b2b;
-            }
-            .emergency-section h3 {
-                color: #ff4b2b;
-                margin-bottom: 1rem;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-            .emergency-section ul {
-                list-style: none;
-                padding: 0;
-            }
-            .emergency-section li {
-                padding: 0.3rem 0;
-                padding-left: 1.5rem;
-                position: relative;
-            }
-            .emergency-section li::before {
-                content: '•';
-                color: #ff4b2b;
-                position: absolute;
-                left: 0;
-                font-weight: bold;
-            }
-            .emergency-disclaimer {
-                background: rgba(255, 75, 43, 0.1);
-                border: 1px solid rgba(255, 75, 43, 0.3);
-                border-radius: 10px;
-                padding: 1rem;
-                margin-top: 1.5rem;
-            }
-        `;
-        document.head.appendChild(style);
+        // Emergency modal styles are now handled by CSS
 
         document.body.appendChild(modalDiv);
     },
@@ -902,80 +786,7 @@ const AboutHandler = {
             justify-content: center;
         `;
 
-        // Add about-specific styles
-        const style = document.createElement('style');
-        style.textContent = `
-            .about-section {
-                margin: 1.5rem 0;
-                padding: 1rem;
-                background: var(--bg-card);
-                border-radius: 10px;
-                border-left: 4px solid #667eea;
-            }
-            .about-section h3 {
-                color: #667eea;
-                margin-bottom: 1rem;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-            .about-section ul, .about-section ol {
-                list-style: none;
-                padding: 0;
-            }
-            .about-section li {
-                padding: 0.3rem 0;
-                padding-left: 1.5rem;
-                position: relative;
-                line-height: 1.5;
-            }
-            .about-section ul li::before {
-                content: '✓';
-                color: #667eea;
-                position: absolute;
-                left: 0;
-                font-weight: bold;
-            }
-            .about-section ol {
-                counter-reset: item;
-            }
-            .about-section ol li {
-                counter-increment: item;
-            }
-            .about-section ol li::before {
-                content: counter(item) '.';
-                color: #667eea;
-                position: absolute;
-                left: 0;
-                font-weight: bold;
-            }
-            .about-disclaimer {
-                background: rgba(255, 193, 7, 0.1);
-                border: 1px solid rgba(255, 193, 7, 0.3);
-                border-radius: 10px;
-                padding: 1rem;
-                margin: 1.5rem 0;
-            }
-            .about-disclaimer h4 {
-                color: #ffc107;
-                margin-bottom: 0.5rem;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-            .about-footer {
-                background: var(--bg-card);
-                border-radius: 10px;
-                padding: 1rem;
-                margin-top: 1.5rem;
-                border-top: 2px solid #667eea;
-            }
-            .about-footer p {
-                margin: 0.3rem 0;
-                color: var(--text-secondary);
-            }
-        `;
-        document.head.appendChild(style);
+        // About modal styles are now handled by CSS
 
         document.body.appendChild(modalDiv);
     },
@@ -1125,9 +936,7 @@ const App = {
             await BackendSwitcher.detectAvailableBackend();
 
             // Show welcome message
-            setTimeout(() => {
-                Utils.showNotification('Welcome to Medicino! Your AI-powered medical assistant is ready.', 'success');
-            }, 1000);
+           
 
             // Add loading animations
             document.body.style.opacity = '0';
