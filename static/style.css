@@ -29,6 +29,8 @@ body {
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
+    font-size: 16px;
+    line-height: 1.6;
 }
 
 /* Animated Background */
@@ -64,7 +66,7 @@ body {
 
 /* Header */
 .header {
-    padding: 2rem 0;
+    padding: 1.5rem 0;
     position: relative;
 }
 
@@ -134,6 +136,7 @@ body {
     gap: 0.5rem;
     transition: all 0.3s ease;
     cursor: pointer;
+    min-height: 44px; /* Touch-friendly minimum height */
 }
 
 .login-btn {
@@ -178,27 +181,6 @@ body {
 .welcome-text {
     color: var(--text-secondary);
     font-weight: 500;
-}
-
-/* Responsive header */
-@media (max-width: 768px) {
-    .header-content {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .header-left {
-        text-align: center;
-    }
-    
-    .auth-buttons {
-        justify-content: center;
-    }
-    
-    .user-info {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
 }
 
 /* Flash Messages */
@@ -315,6 +297,7 @@ body {
     font-size: 1rem;
     transition: all 0.3s ease;
     font-family: inherit;
+    min-height: 44px; /* Touch-friendly minimum height */
 }
 
 .modern-input:focus {
@@ -343,6 +326,8 @@ body {
     text-decoration: none;
     position: relative;
     overflow: hidden;
+    min-height: 44px; /* Touch-friendly minimum height */
+    min-width: 44px; /* Touch-friendly minimum width */
 }
 
 .btn-primary {
@@ -651,6 +636,11 @@ body {
     padding: 0.5rem;
     border-radius: 50%;
     transition: background 0.3s ease;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .close-btn:hover {
@@ -813,52 +803,681 @@ body {
     line-height: 1.5;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
+/* Responsive Design - Mobile First Approach */
+@media (max-width: 1200px) {
     .container {
-        padding: 0 1rem;
+        max-width: 100%;
+        padding: 0 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Mobile Typography */
+    body {
+        font-size: 14px;
     }
 
-    .glass-card {
-        padding: 1.5rem;
+    /* Mobile Header */
+    .header {
+        padding: 1rem 0;
+    }
+
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .header-left {
+        text-align: center;
     }
 
     .header h1 {
         font-size: 2rem;
+        margin-bottom: 0.3rem;
     }
 
-    .btn {
-        padding: 0.6rem 1.2rem;
+    .header .subtitle {
         font-size: 0.9rem;
     }
 
+    /* Mobile Authentication */
+    .auth-buttons {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .auth-btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
+        min-height: 40px;
+    }
+
+    .user-info {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+
+    .welcome-text {
+        font-size: 0.9rem;
+    }
+
+    /* Mobile Container */
+    .container {
+        padding: 0 1rem;
+    }
+
+    /* Mobile Glass Cards */
+    .glass-card {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-radius: 16px;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+
+    .card-title i {
+        font-size: 1.3rem;
+    }
+
+    /* Mobile Inputs */
+    .input-group {
+        margin-bottom: 1rem;
+    }
+
+    .input-group label {
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .modern-input {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+        min-height: 40px;
+    }
+
+    /* Mobile Buttons */
+    .btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+        min-height: 40px;
+        min-width: 40px;
+        justify-content: center;
+    }
+
+    /* Mobile Results */
+    .results-card {
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .result-item {
+        padding: 0.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .result-label {
+        font-size: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+
+    .result-value {
+        font-size: 0.9rem;
+    }
+
+    /* Mobile Medicine Cards */
+    .medicine-card {
+        padding: 1rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .medicine-name {
+        font-size: 1.1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+
+    .medicine-detail {
+        font-size: 0.85rem;
+    }
+
+    /* Mobile Modals */
     .modal-content {
         width: 95%;
         max-height: 95vh;
+        margin: 1rem;
     }
 
     .modal-header {
         padding: 1rem;
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+
+    .modal-header h2 {
+        font-size: 1.3rem;
     }
 
     .modal-body {
         padding: 1rem;
+        max-height: 80vh;
+    }
+
+    .close-btn {
+        font-size: 1.2rem;
+        min-width: 40px;
+        min-height: 40px;
+    }
+
+    /* Mobile Emergency Sections */
+    .emergency-section {
+        margin: 1rem 0;
+        padding: 0.8rem;
+    }
+
+    .emergency-section h3 {
+        font-size: 1.1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+
+    .emergency-section li {
+        padding: 0.2rem 0;
+        padding-left: 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    /* Mobile About Sections */
+    .about-section {
+        margin: 1rem 0;
+        padding: 0.8rem;
+    }
+
+    .about-section h3 {
+        font-size: 1.1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+
+    .about-section li {
+        padding: 0.2rem 0;
+        padding-left: 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    /* Mobile History */
+    .history-item {
+        padding: 0.8rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .history-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+
+    .history-date {
+        font-size: 0.8rem;
+    }
+
+    .history-content p {
+        font-size: 0.9rem;
+        margin: 0.3rem 0;
+    }
+
+    /* Mobile Flash Messages */
+    .flash-message {
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.3rem;
+    }
+
+    /* Mobile Loading */
+    .loader {
+        padding: 1.5rem;
+    }
+
+    .spinner {
+        width: 35px;
+        height: 35px;
+    }
+
+    .loader-text {
+        font-size: 0.9rem;
+    }
+
+    /* Mobile Severity Badges */
+    .severity-badge {
+        padding: 0.2rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    /* Mobile Price Tags */
+    .price-tag {
+        padding: 0.2rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    /* Mobile Confidence Bar */
+    .confidence-bar {
+        height: 6px;
+    }
+
+    /* Mobile Text Utilities */
+    .text-center {
+        text-align: center;
+    }
+
+    .mb-1 { margin-bottom: 0.8rem; }
+    .mb-2 { margin-bottom: 1.5rem; }
+    .mt-1 { margin-top: 0.8rem; }
+    .mt-2 { margin-top: 1.5rem; }
+}
+
+@media (max-width: 480px) {
+    /* Extra Small Mobile Devices */
+    body {
+        font-size: 13px;
+    }
+
+    .container {
+        padding: 0 0.8rem;
+    }
+
+    .header h1 {
+        font-size: 1.8rem;
+    }
+
+    .header .subtitle {
+        font-size: 0.8rem;
+    }
+
+    .glass-card {
+        padding: 1.2rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .card-title {
+        font-size: 1.3rem;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        min-height: 36px;
+        min-width: 36px;
+    }
+
+    .modern-input {
+        padding: 0.7rem;
+        font-size: 0.85rem;
+        min-height: 36px;
+    }
+
+    .results-card {
+        padding: 1.2rem;
+    }
+
+    .result-item {
+        padding: 0.7rem;
+    }
+
+    .medicine-card {
+        padding: 0.8rem;
+    }
+
+    .modal-content {
+        width: 98%;
+        margin: 0.5rem;
+    }
+
+    .modal-header {
+        padding: 0.8rem;
+    }
+
+    .modal-header h2 {
+        font-size: 1.2rem;
+    }
+
+    .modal-body {
+        padding: 0.8rem;
+    }
+
+    .emergency-section,
+    .about-section {
+        padding: 0.7rem;
+    }
+
+    .emergency-section h3,
+    .about-section h3 {
+        font-size: 1rem;
+    }
+
+    .emergency-section li,
+    .about-section li {
+        font-size: 0.85rem;
+        padding-left: 1rem;
+    }
+
+    .history-item {
+        padding: 0.7rem;
+    }
+
+    .flash-message {
+        padding: 0.7rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .auth-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+        min-height: 36px;
+    }
+
+    .welcome-text {
+        font-size: 0.85rem;
     }
 }
 
-/* Utility Classes */
-.hidden {
-    display: none;
+@media (max-width: 360px) {
+    /* Very Small Mobile Devices */
+    body {
+        font-size: 12px;
+    }
+
+    .container {
+        padding: 0 0.5rem;
+    }
+
+    .header h1 {
+        font-size: 1.6rem;
+    }
+
+    .glass-card {
+        padding: 1rem;
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+    }
+
+    .btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+        min-height: 32px;
+        min-width: 32px;
+    }
+
+    .modern-input {
+        padding: 0.6rem;
+        font-size: 0.8rem;
+        min-height: 32px;
+    }
+
+    .modal-content {
+        width: 99%;
+        margin: 0.3rem;
+    }
+
+    .modal-header {
+        padding: 0.6rem;
+    }
+
+    .modal-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .modal-body {
+        padding: 0.6rem;
+    }
 }
 
-.text-center {
-    text-align: center;
+/* Landscape Mobile Optimization */
+@media (max-width: 768px) and (orientation: landscape) {
+    .header {
+        padding: 0.8rem 0;
+    }
+
+    .header-content {
+        flex-direction: row;
+        text-align: left;
+    }
+
+    .header-left {
+        text-align: left;
+    }
+
+    .glass-card {
+        padding: 1.2rem;
+    }
+
+    .modal-content {
+        max-height: 85vh;
+    }
+
+    .modal-body {
+        max-height: 60vh;
+    }
 }
 
-.mb-1 { margin-bottom: 1rem; }
-.mb-2 { margin-bottom: 2rem; }
-.mt-1 { margin-top: 1rem; }
-.mt-2 { margin-top: 2rem; }
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    /* Remove hover effects on touch devices */
+    .btn:hover,
+    .glass-card:hover,
+    .medicine-card:hover,
+    .auth-btn:hover {
+        transform: none;
+        box-shadow: var(--shadow-glass);
+    }
+
+    /* Increase touch targets */
+    .btn,
+    .auth-btn,
+    .close-btn {
+        min-height: 48px;
+        min-width: 48px;
+    }
+
+    .modern-input {
+        min-height: 48px;
+    }
+
+    /* Improve scrolling on touch devices */
+    .modal-body {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Better touch feedback */
+    .btn:active,
+    .auth-btn:active,
+    .close-btn:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+    }
+
+    /* Prevent text selection on buttons */
+    .btn,
+    .auth-btn,
+    .close-btn {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+}
+
+/* High DPI Display Support */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .bg-animation::before {
+        background-size: 200% 200%;
+    }
+}
+
+/* Mobile Navigation Improvements */
+@media (max-width: 768px) {
+    /* Improve button spacing on mobile */
+    .text-center {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    /* Better form layout on mobile */
+    .input-group {
+        margin-bottom: 1.2rem;
+    }
+
+    /* Improve modal scrolling */
+    .modal-body {
+        padding-bottom: 2rem;
+    }
+
+    /* Better flash message positioning */
+    .flash-message {
+        margin: 0 0.5rem 0.5rem 0.5rem;
+        border-radius: 8px;
+    }
+
+    /* Improve medicine card layout */
+    .medicine-card {
+        margin-bottom: 1rem;
+    }
+
+    .medicine-detail {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    .medicine-detail strong {
+        margin-bottom: 0.2rem;
+    }
+
+    /* Better results layout */
+    .result-item {
+        margin-bottom: 1.2rem;
+    }
+
+    .result-label {
+        margin-bottom: 0.5rem;
+    }
+
+    /* Improve confidence bar visibility */
+    .confidence-bar {
+        margin-top: 0.8rem;
+    }
+
+    /* Better loading states */
+    .loader {
+        min-height: 120px;
+    }
+
+    /* Improve button groups */
+    .btn + .btn {
+        margin-left: 0.5rem;
+    }
+}
+
+/* Extra Small Mobile Optimizations */
+@media (max-width: 480px) {
+    /* Stack buttons vertically on very small screens */
+    .text-center {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .btn + .btn {
+        margin-left: 0;
+        margin-top: 0.5rem;
+    }
+
+    /* Improve modal usability */
+    .modal-content {
+        margin: 0.5rem;
+        border-radius: 16px;
+    }
+
+    .modal-header {
+        border-radius: 16px 16px 0 0;
+    }
+
+    /* Better text readability */
+    .result-value,
+    .medicine-detail {
+        line-height: 1.4;
+    }
+
+    /* Improve form inputs */
+    .modern-input {
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+
+    /* Better spacing for small screens */
+    .glass-card {
+        margin-bottom: 1rem;
+    }
+
+    .card-title {
+        margin-bottom: 0.8rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .bg-animation,
+    .btn,
+    .auth-btn,
+    .close-btn {
+        display: none !important;
+    }
+
+    .glass-card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        background: white;
+    }
+
+    .modal-content {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        background: white;
+    }
+}
+
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Dark Mode Support (if needed in future) */
+@media (prefers-color-scheme: dark) {
+    /* Future dark mode styles can be added here */
+}
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
@@ -877,3 +1496,17 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--text-primary);
 }
+
+/* Utility Classes */
+.hidden {
+    display: none;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mb-1 { margin-bottom: 1rem; }
+.mb-2 { margin-bottom: 2rem; }
+.mt-1 { margin-top: 1rem; }
+.mt-2 { margin-top: 2rem; }

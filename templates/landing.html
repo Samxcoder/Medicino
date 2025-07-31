@@ -44,13 +44,14 @@
         .auth-section {
             margin-bottom: 2.5rem;
             display: flex;
-            justify-content: flex-end;
+            justify-content: center;
         }
 
         .auth-buttons {
             display: flex;
             gap: 1rem;
             flex-wrap: wrap;
+            justify-content: center;
         }
 
         .auth-btn {
@@ -67,6 +68,8 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
+            min-height: 44px;
+            min-width: 44px;
         }
 
         .auth-btn::before {
@@ -311,51 +314,114 @@
                 padding: 1rem;
             }
 
+            .hero-section {
+                margin-bottom: 2rem;
+            }
+
+            .auth-section {
+                margin-bottom: 2rem;
+            }
+
+            .auth-buttons {
+                flex-direction: column;
+                gap: 0.8rem;
+                width: 100%;
+                max-width: 300px;
+                
+            }
+
+            .auth-btn {
+                width: 100%;
+                max-width: 300px;
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+                min-height: 44px;
+            }
+
             .title {
                 font-size: 2.5rem;
             }
 
             .subtitle {
-                font-size: 1.2rem;
+                font-size: 1rem;
+            }
+
+            .description {
+                font-size: 0.95rem;
+                max-width: 100%;
             }
 
             .features-grid {
                 grid-template-columns: 1fr;
                 gap: 1.5rem;
+                margin-bottom: 2rem;
             }
 
-            .auth-buttons {
-                justify-content: center;
+            .feature-card {
+                padding: 1.5rem;
             }
 
-            .auth-btn {
-                width: 100%;
-                max-width: 200px;
-                justify-content: center;
+            .feature-icon {
+                font-size: 2.5rem;
+            }
+
+            .feature-title {
+                font-size: 1.3rem;
+            }
+
+            .feature-description {
+                font-size: 0.9rem;
             }
 
             .stats-section {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 1rem;
                 padding: 1.5rem;
+                margin: 2rem 0;
             }
 
             .stat-number {
                 font-size: 2rem;
             }
 
+            .stat-label {
+                font-size: 0.9rem;
+            }
+
             .cta-section {
-                padding: 2rem;
+                padding: 1.5rem;
+                margin-top: 2rem;
             }
 
             .cta-title {
                 font-size: 1.5rem;
             }
+
+            .cta-text {
+                font-size: 0.9rem;
+            }
         }
 
         @media (max-width: 480px) {
             .landing-container {
-                padding: 0.5rem;
+                padding: 0.8rem;
+            }
+
+            .hero-section {
+                margin-bottom: 1.5rem;
+            }
+
+            .auth-section {
+                margin-bottom: 1.5rem;
+            }
+
+            .auth-buttons {
+                max-width: 100%;
+            }
+
+            .auth-btn {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.85rem;
             }
 
             .title {
@@ -363,15 +429,84 @@
             }
 
             .logo {
-                font-size: 3rem;
+                font-size: 3.5rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .description {
+                font-size: 0.9rem;
+            }
+
+            .features-grid {
+                gap: 1rem;
+            }
+
+            .feature-card {
+                padding: 1.2rem;
+            }
+
+            .feature-icon {
+                font-size: 2rem;
+            }
+
+            .feature-title {
+                font-size: 1.2rem;
+            }
+
+            .feature-description {
+                font-size: 0.85rem;
             }
 
             .stats-section {
                 grid-template-columns: 1fr;
+                gap: 0.8rem;
+                padding: 1rem;
+            }
+
+            .stat-number {
+                font-size: 1.8rem;
+            }
+
+            .stat-label {
+                font-size: 0.8rem;
             }
 
             .cta-section {
-                padding: 1.5rem;
+                padding: 1.2rem;
+            }
+
+            .cta-title {
+                font-size: 1.3rem;
+            }
+
+            .cta-text {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .auth-btn:hover,
+            .feature-card:hover {
+                transform: none;
+                box-shadow: var(--shadow-glass);
+            }
+
+            .auth-btn:active,
+            .feature-card:active {
+                transform: scale(0.95);
+                transition: transform 0.1s ease;
+            }
+
+            .auth-btn,
+            .feature-card {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
             }
         }
     </style>
