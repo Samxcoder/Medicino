@@ -113,25 +113,107 @@ def init_db():
 
 
 def diagnose_symptoms(symptoms_text):
-    """AI-like symptom diagnosis logic with complete data fields."""
+    """Enhanced AI-like symptom diagnosis logic with improved matching."""
     conn = get_db_connection()
     conditions = conn.execute("SELECT * FROM symptoms_database").fetchall()
     conn.close()
 
+    # Clean and normalize input symptoms
     input_symptoms = [s.strip().lower() for s in re.split(r'[,\s]+', symptoms_text.lower()) if s.strip()]
+    
+    # Remove common words that don't help with diagnosis
+    stop_words = {'and', 'or', 'the', 'a', 'an', 'with', 'have', 'has', 'had', 'been', 'being', 'is', 'are', 'was', 'were', 'be', 'am', 'i', 'my', 'me', 'you', 'your', 'he', 'she', 'it', 'they', 'them', 'their', 'we', 'us', 'our', 'persistent', 'severe', 'mild', 'chronic', 'acute'}
+    input_symptoms = [s for s in input_symptoms if s not in stop_words and len(s) > 2]
+    
+    # Add synonyms for better matching
+    symptom_synonyms = {
+        'fever': ['fever', 'temperature', 'high temperature', 'pyrexia'],
+        'headache': ['headache', 'head pain', 'migraine'],
+        'cough': ['cough', 'coughing', 'dry cough', 'wet cough'],
+        'pain': ['pain', 'ache', 'soreness', 'discomfort'],
+        'nausea': ['nausea', 'sick', 'queasy'],
+        'vomiting': ['vomiting', 'throw up', 'puke'],
+        'diarrhea': ['diarrhea', 'loose stools', 'watery stools'],
+        'fatigue': ['fatigue', 'tired', 'exhaustion', 'weakness'],
+        'shortness': ['shortness', 'breathlessness', 'difficulty breathing'],
+        'chest': ['chest', 'breastbone'],
+        'stomach': ['stomach', 'abdomen', 'belly'],
+        'joint': ['joint', 'arthritis'],
+        'swelling': ['swelling', 'inflammation', 'edema'],
+        'stiffness': ['stiffness', 'rigidity'],
+        'itching': ['itching', 'itchy', 'pruritus'],
+        'rash': ['rash', 'skin rash', 'eruption'],
+        'dizziness': ['dizziness', 'vertigo', 'lightheaded'],
+        'blurred': ['blurred', 'blurry', 'vision problems'],
+        'thirst': ['thirst', 'thirsty', 'dehydration'],
+        'urination': ['urination', 'frequent urination', 'polyuria']
+    }
+    
+    # Expand input symptoms with synonyms
+    expanded_symptoms = []
+    for symptom in input_symptoms:
+        expanded_symptoms.append(symptom)
+        for key, synonyms in symptom_synonyms.items():
+            if symptom in synonyms:
+                expanded_symptoms.extend(synonyms)
+                break
+    
+    input_symptoms = list(set(expanded_symptoms))  # Remove duplicates
+    
     best_match = None
     best_score = 0
+    all_matches = []
 
     for condition in conditions:
         condition_symptoms = [s.strip().lower() for s in condition['symptoms'].split(',')]
-        matches = sum(1 for symptom in input_symptoms if any(symptom in cs or cs in symptom for cs in condition_symptoms))
-        score = matches / len(condition_symptoms) if condition_symptoms else 0
-
-        if score > best_score and score > 0.3:
-            best_score = score
+        
+        # Enhanced matching logic
+        matches = 0
+        matched_symptoms = []
+        
+        for input_symptom in input_symptoms:
+            for condition_symptom in condition_symptoms:
+                # Check for exact matches, partial matches, or synonym matches
+                if (input_symptom in condition_symptom or 
+                    condition_symptom in input_symptom or
+                    input_symptom == condition_symptom or
+                    any(syn in condition_symptom for syn in symptom_synonyms.get(input_symptom, []))):
+                    matches += 1
+                    matched_symptoms.append(condition_symptom)
+                    break
+        
+        # Calculate score with multiple factors
+        if condition_symptoms:
+            # Base score from symptom matches
+            symptom_score = matches / len(condition_symptoms)
+            
+            # Input coverage score
+            input_coverage = matches / len(input_symptoms) if input_symptoms else 0
+            
+            # Weighted final score (prioritize symptom matches)
+            final_score = (symptom_score * 0.6) + (input_coverage * 0.4)
+            
+            # Bonus for exact matches
+            exact_matches = sum(1 for s in input_symptoms if s in condition_symptoms)
+            if exact_matches > 0:
+                final_score += (exact_matches * 0.1)
+        else:
+            final_score = 0
+        
+        all_matches.append({
+            'condition': condition['condition_name'],
+            'score': final_score,
+            'matches': matches,
+            'matched_symptoms': matched_symptoms,
+            'severity': condition['severity_level']
+        })
+        
+        if final_score > best_score:
+            best_score = final_score
             best_match = condition
-
-    if best_match:
+    
+    # Lower threshold and provide better fallback
+    if best_match and best_score > 0.05:  # Very low threshold for better matching
         return {
             'disease': best_match['condition_name'],
             'ayurvedic': best_match['ayurvedic_remedy'],
@@ -142,15 +224,42 @@ def diagnose_symptoms(symptoms_text):
             'precautions': best_match['precautions']
         }
     else:
-        return {
-            'disease': 'Unable to determine condition',
-            'ayurvedic': 'Please consult an Ayurvedic practitioner for personalized treatment.',
-            'medicine': 'Please consult a healthcare professional for proper diagnosis.',
-            'confidence': 0,
-            'severity': 'unknown',
-            'description': 'Your symptoms do not strongly match any known conditions in our database.',
-            'precautions': 'Always seek professional medical advice for an accurate diagnosis.'
-        }
+        # Return top 5 matches with better suggestions
+        top_matches = sorted(all_matches, key=lambda x: x['score'], reverse=True)[:5]
+        suggestions = []
+        
+        for match in top_matches:
+            if match['score'] > 0.01:  # Very low threshold for suggestions
+                severity_emoji = {
+                    'mild': '🟢',
+                    'moderate': '🟡', 
+                    'severe': '🔴',
+                    'unknown': '❓'
+                }.get(match['severity'], '❓')
+                
+                suggestions.append(f"{severity_emoji} {match['condition']} ({match['score']:.1%})")
+        
+        if suggestions:
+            suggestion_text = "\n• " + "\n• ".join(suggestions)
+            return {
+                'disease': 'Multiple possible conditions',
+                'ayurvedic': 'Please consult an Ayurvedic practitioner for personalized treatment based on your specific symptoms.',
+                'medicine': 'Please consult a healthcare professional for proper diagnosis and treatment.',
+                'confidence': 0,
+                'severity': 'unknown',
+                'description': f'Your symptoms could indicate several conditions:\n{suggestion_text}\n\nPlease provide more specific symptoms for better diagnosis.',
+                'precautions': 'Always seek professional medical advice for an accurate diagnosis.' 
+            }
+        else:
+            return {
+                'disease': 'Unable to determine condition',
+                'ayurvedic': 'Please consult an Ayurvedic practitioner for personalized treatment.',
+                'medicine': 'Please consult a healthcare professional for proper diagnosis.',
+                'confidence': 0,
+                'severity': 'unknown',
+                'description': 'Your symptoms do not match any known conditions in our database. Please try describing your symptoms in more detail.',
+                'precautions': 'Always seek professional medical advice for an accurate diagnosis.' 
+            }
 
 @app.route('/')
 def index():
@@ -254,7 +363,6 @@ def diagnose_api():
     return jsonify({'success': True, 'data': diagnosis_result})
 
 @app.route('/api/medicine/<medicine_name>')
-@login_required
 def get_medicine_info_api(medicine_name):
     """Get medicine information API endpoint."""
     conn = get_db_connection()
@@ -267,7 +375,6 @@ def get_medicine_info_api(medicine_name):
         return jsonify({'success': False, 'message': 'Medicine not found'})
 
 @app.route('/api/medicines')
-@login_required
 def list_medicines_api():
     """List all medicines API endpoint."""
     conn = get_db_connection()
