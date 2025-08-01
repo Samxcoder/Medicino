@@ -11,6 +11,10 @@ import sqlite3
 import os
 from datetime import datetime
 
+# Import additional medicines
+from additional_medicines import additional_medicines
+from additional_medicines_2 import additional_medicines_2
+
 DATABASE = 'medicino.db'
 
 def create_database():
@@ -1615,6 +1619,10 @@ def create_database():
             'category': 'Joint Health'
         },
     ]
+    
+    # Add additional medicines from imported files
+    medicines_data.extend(additional_medicines)
+    medicines_data.extend(additional_medicines_2)
     
     cursor.executemany('''
         INSERT INTO medicines (name, description, dosage, side_effects, contraindications, price, category)

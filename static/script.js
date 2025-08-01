@@ -181,11 +181,7 @@ const ApiService = {
         return await ApiService.request(endpoint);
     },
 
-    // Get all medicines
-    getAllMedicines: async () => {
-        const endpoint = CONFIG.CURRENT_BACKEND === 'django' ? '/medicines/' : '/medicines';
-        return await ApiService.request(endpoint);
-    },
+
 
     // Get diagnosis history
     getHistory: async () => {
@@ -436,34 +432,7 @@ const MedicineHandler = {
         }
     },
 
-    showAll: async () => {
-        Utils.showLoader('medicineLoader');
-        Utils.hide('medicineInfoResult');
 
-        const showAllBtn = document.getElementById('showAllBtn');
-        const originalBtnText = showAllBtn.innerHTML;
-        showAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-        showAllBtn.disabled = true;
-
-        try {
-            const response = await ApiService.getAllMedicines();
-
-            if (response.success && response.data && response.data.length > 0) {
-                AppState.allMedicines = response.data;
-                MedicineHandler.displayMedicineInfo(response.data);
-                Utils.showNotification(`Found ${response.data.length} medicines`, 'success');
-            } else {
-                Utils.showNotification('No medicines found in database', 'error');
-            }
-        } catch (error) {
-            console.error('Error loading medicines:', error);
-            Utils.showNotification(`Failed to load medicines: ${error.message}`, 'error');
-        } finally {
-            Utils.hideLoader('medicineLoader');
-            showAllBtn.innerHTML = originalBtnText;
-            showAllBtn.disabled = false;
-        }
-    },
 
     displayMedicineInfo: (medicines) => {
         const resultDiv = document.getElementById('medicineInfoResult');
@@ -856,7 +825,6 @@ const EventListeners = {
 
         // Medicine functionality
         document.getElementById('searchMedicineBtn').addEventListener('click', MedicineHandler.search);
-        document.getElementById('showAllBtn').addEventListener('click', MedicineHandler.showAll);
 
         // Quick actions
         document.getElementById('historyBtn').addEventListener('click', HistoryHandler.show);

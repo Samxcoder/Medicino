@@ -9,6 +9,8 @@ import os
 
 
 app = Flask(__name__)
+CORS(app, origins=["https://medicino.vercel.app"])
+
 app.secret_key = 'your-secret-key-here'  # Change this to a secure secret key
 
 # Flask-Login setup
