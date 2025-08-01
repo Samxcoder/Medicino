@@ -1614,7 +1614,378 @@ def create_database():
             'price': 21.99,
             'category': 'Joint Health'
         },
+        {
+        'name': 'Metoprolol',
+        'description': 'Beta blocker used to treat high blood pressure and heart issues',
+        'dosage': '50-100mg twice daily',
+        'side_effects': 'Tiredness, dizziness, depression',
+        'contraindications': 'Bradycardia, asthma, heart block',
+        'price': 15.25,
+        'category': 'Cardiovascular'
+    },
+    {
+        'name': 'Losartan',
+        'description': 'Angiotensin II receptor blocker for high blood pressure',
+        'dosage': '25-100mg once daily',
+        'side_effects': 'Dizziness, back pain, cold-like symptoms',
+        'contraindications': 'Pregnancy, kidney problems',
+        'price': 13.40,
+        'category': 'Cardiovascular'
+    },
+    {
+        'name': 'Spironolactone',
+        'description': 'Diuretic used for heart failure and hypertension',
+        'dosage': '25-100mg daily',
+        'side_effects': 'Breast tenderness, drowsiness, high potassium',
+        'contraindications': 'Addison’s disease, hyperkalemia',
+        'price': 11.90,
+        'category': 'Cardiovascular'
+    },
+    {
+        'name': 'Enalapril',
+        'description': 'ACE inhibitor for hypertension and heart failure',
+        'dosage': '5-20mg daily',
+        'side_effects': 'Cough, dizziness, elevated potassium',
+        'contraindications': 'Pregnancy, kidney impairment',
+        'price': 10.30,
+        'category': 'Cardiovascular'
+    },
+    {
+        'name': 'Rosuvastatin',
+        'description': 'Statin used to lower cholesterol',
+        'dosage': '5-40mg daily',
+        'side_effects': 'Muscle pain, abdominal pain, nausea',
+        'contraindications': 'Liver disease, pregnancy',
+        'price': 14.10,
+        'category': 'Cardiovascular'
+    },
+    {
+        'name': 'Glibenclamide',
+        'description': 'Sulfonylurea used for type 2 diabetes',
+        'dosage': '2.5-5mg once or twice daily',
+        'side_effects': 'Low blood sugar, nausea, weight gain',
+        'contraindications': 'Type 1 diabetes, ketoacidosis',
+        'price': 7.80,
+        'category': 'Diabetes'
+    },
+    {
+        'name': 'Linagliptin',
+        'description': 'DPP-4 inhibitor for type 2 diabetes',
+        'dosage': '5mg once daily',
+        'side_effects': 'Nasopharyngitis, cough, joint pain',
+        'contraindications': 'Type 1 diabetes, diabetic ketoacidosis',
+        'price': 9.25,
+        'category': 'Diabetes'
+    },
+    {
+        'name': 'Empagliflozin',
+        'description': 'SGLT2 inhibitor for diabetes and heart failure',
+        'dosage': '10-25mg once daily',
+        'side_effects': 'Urinary infections, dehydration, weight loss',
+        'contraindications': 'Severe kidney impairment',
+        'price': 16.30,
+        'category': 'Diabetes'
+    },
+    {
+        'name': 'Budesonide',
+        'description': 'Corticosteroid for asthma and allergic rhinitis',
+        'dosage': '200-800mcg inhaled daily',
+        'side_effects': 'Throat irritation, cough, oral thrush',
+        'contraindications': 'Acute asthma attack',
+        'price': 12.10,
+        'category': 'Respiratory'
+    },
+    {
+        'name': 'Tiotropium',
+        'description': 'Long-acting bronchodilator for COPD',
+        'dosage': '18mcg inhaled once daily',
+        'side_effects': 'Dry mouth, constipation, chest pain',
+        'contraindications': 'Hypersensitivity, glaucoma',
+        'price': 13.00,
+        'category': 'Respiratory'
+    },
+    {
+        'name': 'Theophylline',
+        'description': 'Bronchodilator for asthma and COPD',
+        'dosage': '300-600mg daily',
+        'side_effects': 'Nausea, headache, insomnia',
+        'contraindications': 'Active peptic ulcer, seizure disorders',
+        'price': 11.60,
+        'category': 'Respiratory'
+    },
+        {
+        'name': 'Famotidine',
+        'description': 'H2 blocker used to treat ulcers and GERD',
+        'dosage': '20-40mg daily',
+        'side_effects': 'Constipation, headache, dizziness',
+        'contraindications': 'Kidney dysfunction',
+        'price': 5.70,
+        'category': 'Digestive'
+    },
+    {
+        'name': 'Lansoprazole',
+        'description': 'Proton pump inhibitor for GERD and ulcers',
+        'dosage': '15-30mg daily',
+        'side_effects': 'Headache, diarrhea, rash',
+        'contraindications': 'Liver disease, osteoporosis',
+        'price': 6.90,
+        'category': 'Digestive'
+    },
+    {
+        'name': 'Pantoprazole',
+        'description': 'PPI used for treating acid reflux and ulcers',
+        'dosage': '20-40mg once daily',
+        'side_effects': 'Abdominal pain, flatulence, dizziness',
+        'contraindications': 'Liver disease, lupus',
+        'price': 6.75,
+        'category': 'Digestive'
+    },
+    {
+        'name': 'Citalopram',
+        'description': 'SSRI for depression and anxiety',
+        'dosage': '20-40mg once daily',
+        'side_effects': 'Dry mouth, drowsiness, nausea',
+        'contraindications': 'MAOIs, QT prolongation',
+        'price': 15.40,
+        'category': 'Mental Health'
+    },
+    {
+        'name': 'Quetiapine',
+        'description': 'Atypical antipsychotic for schizophrenia and bipolar disorder',
+        'dosage': '150-750mg daily',
+        'side_effects': 'Drowsiness, weight gain, dizziness',
+        'contraindications': 'Dementia-related psychosis',
+        'price': 18.25,
+        'category': 'Mental Health'
+    },
+    {
+        'name': 'Olanzapine',
+        'description': 'Antipsychotic used for bipolar disorder and schizophrenia',
+        'dosage': '5-20mg daily',
+        'side_effects': 'Weight gain, sleepiness, increased appetite',
+        'contraindications': 'Glaucoma, liver impairment',
+        'price': 17.90,
+        'category': 'Mental Health'
+    },
+    {
+        'name': 'Amitriptyline',
+        'description': 'Tricyclic antidepressant for depression and neuropathic pain',
+        'dosage': '25-150mg at bedtime',
+        'side_effects': 'Dry mouth, constipation, blurred vision',
+        'contraindications': 'Recent heart attack, MAOI use',
+        'price': 10.80,
+        'category': 'Mental Health'
+    },
+    {
+        'name': 'Gabapentin',
+        'description': 'Used for nerve pain and seizures',
+        'dosage': '300-1800mg daily',
+        'side_effects': 'Dizziness, fatigue, weight gain',
+        'contraindications': 'Hypersensitivity, renal impairment',
+        'price': 13.50,
+        'category': 'Neurology'
+    },
+    {
+        'name': 'Levetiracetam',
+        'description': 'Antiepileptic used to treat seizures',
+        'dosage': '500-1500mg twice daily',
+        'side_effects': 'Drowsiness, mood changes, irritability',
+        'contraindications': 'Kidney problems',
+        'price': 15.70,
+        'category': 'Neurology'
+    },
+    {
+        'name': 'Topiramate',
+        'description': 'Anticonvulsant for epilepsy and migraines',
+        'dosage': '25-200mg daily',
+        'side_effects': 'Tingling, fatigue, appetite loss',
+        'contraindications': 'Pregnancy, kidney stones',
+        'price': 14.25,
+        'category': 'Neurology'
+    },
+        {
+        'name': 'Terbinafine',
+        'description': 'Antifungal used to treat skin and nail infections',
+        'dosage': '250mg once daily',
+        'side_effects': 'Headache, rash, gastrointestinal upset',
+        'contraindications': 'Liver disease, allergy to terbinafine',
+        'price': 11.80,
+        'category': 'Antifungal'
+    },
+    {
+        'name': 'Ketoconazole',
+        'description': 'Antifungal used for fungal infections and seborrheic dermatitis',
+        'dosage': '200-400mg daily',
+        'side_effects': 'Nausea, liver enzyme changes, headache',
+        'contraindications': 'Liver disease, coadministration with certain drugs',
+        'price': 10.90,
+        'category': 'Antifungal'
+    },
+    {
+        'name': 'Clotrimazole',
+        'description': 'Topical antifungal for skin and vaginal infections',
+        'dosage': 'Apply 2-3 times daily',
+        'side_effects': 'Skin irritation, burning, redness',
+        'contraindications': 'Allergy to clotrimazole',
+        'price': 6.75,
+        'category': 'Antifungal'
+    },
+    {
+        'name': 'Nystatin',
+        'description': 'Antifungal used to treat oral and intestinal candidiasis',
+        'dosage': '400,000-600,000 units 4 times daily',
+        'side_effects': 'Diarrhea, nausea, vomiting',
+        'contraindications': 'Hypersensitivity to nystatin',
+        'price': 8.40,
+        'category': 'Antifungal'
+    },
+    {
+        'name': 'Labetalol',
+        'description': 'Beta blocker used for hypertension and hypertensive emergencies',
+        'dosage': '100-400mg twice daily',
+        'side_effects': 'Dizziness, fatigue, nausea',
+        'contraindications': 'Asthma, heart block, bradycardia',
+        'price': 14.90,
+        'category': 'Cardiovascular'
+    },
+    {
+        'name': 'Doxazosin',
+        'description': 'Alpha-blocker used for hypertension and BPH',
+        'dosage': '1-8mg once daily',
+        'side_effects': 'Dizziness, fatigue, headache',
+        'contraindications': 'Hypotension, allergy to doxazosin',
+        'price': 10.30,
+        'category': 'Cardiovascular'
+    },
+    {
+        'name': 'Hydralazine',
+        'description': 'Vasodilator used to treat high blood pressure',
+        'dosage': '25-100mg 2-4 times daily',
+        'side_effects': 'Headache, palpitations, fluid retention',
+        'contraindications': 'Coronary artery disease, rheumatic heart disease',
+        'price': 9.85,
+        'category': 'Cardiovascular'
+    },
+    {
+        'name': 'Chlorthalidone',
+        'description': 'Thiazide-like diuretic used for hypertension',
+        'dosage': '12.5-50mg once daily',
+        'side_effects': 'Electrolyte imbalance, dizziness, muscle cramps',
+        'contraindications': 'Anuria, severe kidney or liver disease',
+        'price': 8.60,
+        'category': 'Cardiovascular'
+    },
+    {
+        'name': 'Rivaroxaban',
+        'description': 'Anticoagulant used for stroke prevention and DVT',
+        'dosage': '10-20mg once daily with food',
+        'side_effects': 'Bleeding, bruising, nausea',
+        'contraindications': 'Active bleeding, hepatic disease',
+        'price': 19.75,
+        'category': 'Cardiovascular'
+    },
+    {
+        'name': 'Warfarin',
+        'description': 'Oral anticoagulant used to prevent blood clots',
+        'dosage': '2-10mg once daily',
+        'side_effects': 'Bleeding, bruising, hair loss',
+        'contraindications': 'Pregnancy, active bleeding, liver disease',
+        'price': 7.40,
+        'category': 'Cardiovascular'
+    },
+    {
+        'name': 'Pioglitazone',
+        'description': 'Thiazolidinedione for type 2 diabetes',
+        'dosage': '15-45mg once daily',
+        'side_effects': 'Weight gain, edema, risk of heart failure',
+        'contraindications': 'Heart failure, liver disease',
+        'price': 11.20,
+        'category': 'Diabetes'
+    },
+    {
+        'name': 'Sitagliptin',
+        'description': 'DPP-4 inhibitor for type 2 diabetes',
+        'dosage': '100mg once daily',
+        'side_effects': 'Upper respiratory infection, headache, joint pain',
+        'contraindications': 'Type 1 diabetes, DKA',
+        'price': 13.60,
+        'category': 'Diabetes'
+    },
+    {
+        'name': 'Nateglinide',
+        'description': 'Meglitinide for post-meal blood sugar control',
+        'dosage': '120mg before meals',
+        'side_effects': 'Low blood sugar, upper respiratory tract infection',
+        'contraindications': 'Type 1 diabetes, DKA',
+        'price': 12.90,
+        'category': 'Diabetes'
+    },
+    {
+        'name': 'Acarbose',
+        'description': 'Alpha-glucosidase inhibitor for type 2 diabetes',
+        'dosage': '25-100mg three times daily',
+        'side_effects': 'Gas, abdominal discomfort, diarrhea',
+        'contraindications': 'Inflammatory bowel disease, intestinal obstruction',
+        'price': 9.10,
+        'category': 'Diabetes'
+    },
+    {
+        'name': 'Insulin Glargine',
+        'description': 'Long-acting insulin for blood sugar control',
+        'dosage': 'Individualized (usually once daily)',
+        'side_effects': 'Low blood sugar, injection site reactions',
+        'contraindications': 'Hypoglycemia, hypersensitivity',
+        'price': 23.50,
+        'category': 'Diabetes'
+    },
+    {
+        'name': 'Insulin Aspart',
+        'description': 'Rapid-acting insulin for mealtime glucose control',
+        'dosage': 'Individualized before meals',
+        'side_effects': 'Low blood sugar, redness at injection site',
+        'contraindications': 'Hypoglycemia, allergy to insulin',
+        'price': 22.30,
+        'category': 'Diabetes'
+    },
+    {
+        'name': 'Methylprednisolone',
+        'description': 'Steroid for inflammation, allergies, and autoimmune conditions',
+        'dosage': '4-48mg daily',
+        'side_effects': 'Insomnia, mood changes, fluid retention',
+        'contraindications': 'Systemic fungal infections, live vaccines',
+        'price': 10.90,
+        'category': 'Steroid'
+    },
+    {
+        'name': 'Prednisolone',
+        'description': 'Glucocorticoid for inflammation and immune suppression',
+        'dosage': '5-60mg daily',
+        'side_effects': 'Increased appetite, mood swings, acne',
+        'contraindications': 'Systemic infections, live vaccines',
+        'price': 9.85,
+        'category': 'Steroid'
+    },
+    {
+        'name': 'Betamethasone',
+        'description': 'Potent corticosteroid used in severe inflammation',
+        'dosage': '0.5-5mg daily or topical use',
+        'side_effects': 'Skin thinning, adrenal suppression, increased glucose',
+        'contraindications': 'Untreated infections, allergy to steroid',
+        'price': 8.20,
+        'category': 'Steroid'
+    },
+    {
+        'name': 'Beclomethasone',
+        'description': 'Inhaled corticosteroid for asthma maintenance',
+        'dosage': '100-400mcg twice daily',
+        'side_effects': 'Oral thrush, cough, hoarseness',
+        'contraindications': 'Acute asthma attack, hypersensitivity',
+        'price': 9.60,
+        'category': 'Respiratory'
+    }
+    
     ]
+
     
     cursor.executemany('''
         INSERT INTO medicines (name, description, dosage, side_effects, contraindications, price, category)

@@ -12,9 +12,12 @@
     <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
     <div class="bg-animation"></div>
 
-    <div class="container">
+    <div class="container" id="main-content" role="main">
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -85,7 +88,12 @@
                     rows="4"
                     placeholder="e.g., fever, headache, cough, stomach pain, nausea..."
                     style="resize: vertical; min-height: 120px;"
+                    aria-describedby="symptoms-help"
+                    aria-required="true"
                 ></textarea>
+                <div id="symptoms-help" class="sr-only">
+                    Describe your symptoms in detail for better diagnosis accuracy
+                </div>
                 
                 <!-- Enhanced Symptom Suggestions -->
                 <div class="symptom-suggestions">
@@ -196,7 +204,12 @@
                     id="medicineInput"
                     class="modern-input"
                     placeholder="e.g., Paracetamol, Ibuprofen, Cetirizine..."
+                    aria-describedby="medicine-help"
+                    aria-required="true"
                 >
+                <div id="medicine-help" class="sr-only">
+                    Enter the name of the medicine you want to search for
+                </div>
             </div>
 
             <div class="text-center">

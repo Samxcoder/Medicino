@@ -18,7 +18,10 @@ const AppState = {
     currentDiagnosis: null,
     diagnosisHistory: [],
     allMedicines: [],
-    isLoading: false
+    isLoading: false,
+    lastError: null,
+    retryCount: 0,
+    maxRetries: 3
 };
 
 // Utility Functions
@@ -105,6 +108,10 @@ const Utils = {
 
     // Validate symptoms input
     validateSymptoms: (symptoms) => {
+        if (!symptoms || typeof symptoms !== 'string') {
+            return { valid: false, message: 'Please enter your symptoms' };
+        }
+        
         const cleaned = Utils.cleanSymptoms(symptoms);
         if (!cleaned || cleaned.length < 3) {
             return { valid: false, message: 'Please enter at least 3 characters describing your symptoms' };
@@ -112,6 +119,38 @@ const Utils = {
         if (cleaned.length > 500) {
             return { valid: false, message: 'Symptoms description is too long (max 500 characters)' };
         }
+        
+        // Check for common medical terms or symptoms
+        const medicalTerms = ['fever', 'headache', 'cough', 'pain', 'nausea', 'vomiting', 'fatigue', 'dizziness', 'rash', 'swelling'];
+        const hasMedicalTerm = medicalTerms.some(term => cleaned.toLowerCase().includes(term));
+        
+        if (!hasMedicalTerm && cleaned.length < 10) {
+            return { valid: false, message: 'Please provide more specific symptoms for better diagnosis' };
+        }
+        
+        return { valid: true, cleaned: cleaned };
+    },
+
+    // Validate medicine name
+    validateMedicine: (medicineName) => {
+        if (!medicineName || typeof medicineName !== 'string') {
+            return { valid: false, message: 'Please enter a medicine name' };
+        }
+        
+        const cleaned = medicineName.trim();
+        if (cleaned.length < 2) {
+            return { valid: false, message: 'Please enter at least 2 characters' };
+        }
+        if (cleaned.length > 100) {
+            return { valid: false, message: 'Medicine name is too long' };
+        }
+        
+        // Check for valid characters
+        const validPattern = /^[a-zA-Z0-9\s\-\.]+$/;
+        if (!validPattern.test(cleaned)) {
+            return { valid: false, message: 'Medicine name contains invalid characters' };
+        }
+        
         return { valid: true, cleaned: cleaned };
     }
 };
@@ -125,7 +164,7 @@ const ApiService = {
             CONFIG.API_BASE_URL;
     },
 
-    // Generic API request function
+    // Generic API request function with retry logic
     request: async (endpoint, options = {}) => {
         const url = `${ApiService.getApiUrl()}${endpoint}`;
         const defaultOptions = {
@@ -138,30 +177,51 @@ const ApiService = {
 
         const requestOptions = { ...defaultOptions, ...options };
 
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), requestOptions.timeout);
+        const attemptRequest = async (attempt = 1) => {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), requestOptions.timeout);
 
-            const response = await fetch(url, {
-                ...requestOptions,
-                signal: controller.signal
-            });
+                const response = await fetch(url, {
+                    ...requestOptions,
+                    signal: controller.signal
+                });
 
-            clearTimeout(timeoutId);
+                clearTimeout(timeoutId);
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                if (!response.ok) {
+                    const errorText = await response.text().catch(() => 'Unknown error');
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                const data = await response.json();
+                AppState.retryCount = 0; // Reset retry count on success
+                return data;
+            } catch (error) {
+                console.error(`API Request Error (attempt ${attempt}):`, error);
+                
+                if (error.name === 'AbortError') {
+                    throw new Error('Request timeout. Please check your connection and try again.');
+                }
+                
+                // Retry logic for network errors
+                if (attempt < AppState.maxRetries && (
+                    error.message.includes('Failed to fetch') ||
+                    error.message.includes('NetworkError') ||
+                    error.message.includes('timeout')
+                )) {
+                    console.log(`Retrying request (${attempt}/${AppState.maxRetries})...`);
+                    AppState.retryCount = attempt;
+                    await new Promise(resolve => setTimeout(resolve, 1000 * attempt)); // Exponential backoff
+                    return attemptRequest(attempt + 1);
+                }
+                
+                AppState.lastError = error.message;
+                throw error;
             }
+        };
 
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error('API Request Error:', error);
-            if (error.name === 'AbortError') {
-                throw new Error('Request timeout. Please check your connection and try again.');
-            }
-            throw error;
-        }
+        return attemptRequest();
     },
 
     // Diagnose symptoms
@@ -390,16 +450,15 @@ const MedicineHandler = {
         const medicineInput = document.getElementById('medicineInput');
         const medicineName = medicineInput.value.trim();
 
-        if (!medicineName) {
-            Utils.showNotification('Please enter a medicine name', 'error');
+        // Validate input
+        const validation = Utils.validateMedicine(medicineName);
+        if (!validation.valid) {
+            Utils.showNotification(validation.message, 'error');
             medicineInput.focus();
             return;
         }
 
-        if (medicineName.length < 2) {
-            Utils.showNotification('Please enter at least 2 characters', 'error');
-            return;
-        }
+        const cleanedMedicineName = validation.cleaned;
 
         // Show loading state
         Utils.showLoader('medicineLoader');
@@ -993,11 +1052,69 @@ const EventListeners = {
                 console.error('❌ medicineInput not found');
             }
 
-            // Auto-resize textarea
+            // Auto-resize textarea and validation
             if (symptomsInput) {
                 symptomsInput.addEventListener('input', () => {
                     symptomsInput.style.height = 'auto';
                     symptomsInput.style.height = Math.min(symptomsInput.scrollHeight, 200) + 'px';
+                    
+                    // Real-time validation
+                    const validation = Utils.validateSymptoms(symptomsInput.value);
+                    symptomsInput.setAttribute('aria-invalid', !validation.valid);
+                    
+                    // Remove any existing validation message
+                    const existingMessage = document.getElementById('symptoms-validation');
+                    if (existingMessage) {
+                        existingMessage.remove();
+                    }
+                    
+                    // Add validation message if invalid
+                    if (!validation.valid && symptomsInput.value.length > 0) {
+                        const message = document.createElement('div');
+                        message.id = 'symptoms-validation';
+                        message.className = 'validation-message';
+                        message.style.cssText = `
+                            color: var(--danger);
+                            font-size: var(--font-size-sm);
+                            margin-top: var(--space-xs);
+                            display: flex;
+                            align-items: center;
+                            gap: var(--space-xs);
+                        `;
+                        message.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${validation.message}`;
+                        symptomsInput.parentNode.appendChild(message);
+                    }
+                });
+            }
+
+            // Medicine input validation
+            if (medicineInput) {
+                medicineInput.addEventListener('input', () => {
+                    const validation = Utils.validateMedicine(medicineInput.value);
+                    medicineInput.setAttribute('aria-invalid', !validation.valid);
+                    
+                    // Remove any existing validation message
+                    const existingMessage = document.getElementById('medicine-validation');
+                    if (existingMessage) {
+                        existingMessage.remove();
+                    }
+                    
+                    // Add validation message if invalid
+                    if (!validation.valid && medicineInput.value.length > 0) {
+                        const message = document.createElement('div');
+                        message.id = 'medicine-validation';
+                        message.className = 'validation-message';
+                        message.style.cssText = `
+                            color: var(--danger);
+                            font-size: var(--font-size-sm);
+                            margin-top: var(--space-xs);
+                            display: flex;
+                            align-items: center;
+                            gap: var(--space-xs);
+                        `;
+                        message.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${validation.message}`;
+                        medicineInput.parentNode.appendChild(message);
+                    }
                 });
             }
 

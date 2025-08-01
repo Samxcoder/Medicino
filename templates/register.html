@@ -278,9 +278,12 @@
     </style>
 </head>
 <body>
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
     <div class="bg-animation"></div>
     
-    <div class="auth-container">
+    <div class="auth-container" id="main-content" role="main">
         <div class="auth-card">
             <!-- Flash Messages -->
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -304,23 +307,27 @@
             <form method="POST" action="{{ url_for('register') }}">
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input type="text" id="username" name="username" class="form-input" required>
+                    <input type="text" id="username" name="username" class="form-input" required aria-describedby="username-help">
+                    <div id="username-help" class="sr-only">Choose a unique username for your account</div>
                 </div>
 
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" class="form-input" required>
+                    <input type="email" id="email" name="email" class="form-input" required aria-describedby="email-help">
+                    <div id="email-help" class="sr-only">Enter your email address for account verification</div>
                 </div>
 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" class="form-input" required>
+                    <input type="password" id="password" name="password" class="form-input" required aria-describedby="password-help">
+                    <div id="password-help" class="sr-only">Create a password for your account</div>
                     <div class="password-hint">Password must be at least 6 characters long</div>
                 </div>
 
                 <div class="form-group">
                     <label for="confirm_password">Confirm Password</label>
-                    <input type="password" id="confirm_password" name="confirm_password" class="form-input" required>
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-input" required aria-describedby="confirm-password-help">
+                    <div id="confirm-password-help" class="sr-only">Re-enter your password to confirm</div>
                 </div>
 
                 <button type="submit" class="auth-btn">
