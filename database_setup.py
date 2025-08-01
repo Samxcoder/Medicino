@@ -1138,6 +1138,7 @@ def create_database():
             "description": "A parasitic infection transmitted by mosquitoes",
             "precautions": "Use mosquito nets, take prophylaxis, avoid mosquito bites"
         },
+        
 
     ]
     
