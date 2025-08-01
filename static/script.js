@@ -548,22 +548,49 @@ const HistoryHandler = {
                 HistoryHandler.displayHistory(response.data);
             } else {
                 Utils.showNotification('No history found', 'error');
+                // Show empty history modal
+                HistoryHandler.displayHistory([]);
             }
         } catch (error) {
             console.error('Error loading history:', error);
             Utils.showNotification(`Failed to load history: ${error.message}`, 'error');
+            // Show empty history modal even on error
+            HistoryHandler.displayHistory([]);
         }
     },
 
     displayHistory: (history) => {
-        if (!history || history.length === 0) {
-            Utils.showNotification('No diagnosis history available', 'info');
-            return;
-        }
-
         // Create modal for history display
         const modal = document.createElement('div');
         modal.className = 'history-modal';
+        
+        let historyContent = '';
+        if (!history || history.length === 0) {
+            historyContent = `
+                <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                    <i class="fas fa-history" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <h3>No Diagnosis History</h3>
+                    <p>You haven't made any diagnoses yet. Start by analyzing your symptoms!</p>
+                </div>
+            `;
+        } else {
+            historyContent = history.map((record, index) => `
+                <div class="history-item">
+                    <div class="history-header">
+                        <strong>Diagnosis #${history.length - index}</strong>
+                        <span class="history-date">${new Date(record.created_at).toLocaleString()}</span>
+                    </div>
+                    <div class="history-content">
+                        <p><strong>Symptoms:</strong> ${record.symptoms}</p>
+                        <p><strong>Condition:</strong> ${record.diagnosed_condition}</p>
+                        <p><strong>Confidence:</strong> ${record.confidence_score}%</p>
+                        <p><strong>Ayurvedic Remedy:</strong> ${record.ayurvedic_remedy}</p>
+                        <p><strong>Medicine:</strong> ${record.medicine_suggestion}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
         modal.innerHTML = `
             <div class="modal-overlay" onclick="HistoryHandler.closeModal()"></div>
             <div class="modal-content">
@@ -574,21 +601,7 @@ const HistoryHandler = {
                     </button>
                 </div>
                 <div class="modal-body">
-                    ${history.map((record, index) => `
-                        <div class="history-item">
-                            <div class="history-header">
-                                <strong>Diagnosis #${history.length - index}</strong>
-                                <span class="history-date">${new Date(record.created_at).toLocaleString()}</span>
-                            </div>
-                            <div class="history-content">
-                                <p><strong>Symptoms:</strong> ${record.symptoms}</p>
-                                <p><strong>Condition:</strong> ${record.diagnosed_condition}</p>
-                                <p><strong>Confidence:</strong> ${record.confidence_score}%</p>
-                                <p><strong>Ayurvedic Remedy:</strong> ${record.ayurvedic_remedy}</p>
-                                <p><strong>Medicine:</strong> ${record.medicine_suggestion}</p>
-                            </div>
-                        </div>
-                    `).join('')}
+                    ${historyContent}
                 </div>
             </div>
         `;
@@ -610,7 +623,9 @@ const HistoryHandler = {
 
         // Modal styles are now handled by CSS
 
-        Utils.showNotification(`Loaded ${history.length} diagnosis records`, 'success');
+        if (history && history.length > 0) {
+            Utils.showNotification(`Loaded ${history.length} diagnosis records`, 'success');
+        }
     },
 
     closeModal: () => {
@@ -958,6 +973,9 @@ const App = {
             // Setup event listeners
             EventListeners.init();
 
+            // Initialize flash message auto-dismiss
+            App.initFlashMessages();
+
             // Detect available backend
             await BackendSwitcher.detectAvailableBackend();
 
@@ -978,6 +996,46 @@ const App = {
             console.error('❌ Error initializing application:', error);
             Utils.showNotification('Application initialization failed. Please refresh the page.', 'error');
         }
+    },
+
+    // Initialize flash message functionality
+    initFlashMessages: () => {
+        const flashMessages = document.querySelectorAll('.flash-message');
+        
+        flashMessages.forEach(message => {
+            // Check if this is a logout notification and remove it instantly
+            if (message.textContent.includes('logged out') || message.textContent.includes('You have been logged out')) {
+                // Remove logout notification instantly
+                App.dismissFlashMessage(message);
+                return;
+            }
+
+            // Auto-dismiss other messages after 5 seconds
+            const autoDismissTimer = setTimeout(() => {
+                App.dismissFlashMessage(message);
+            }, 5000);
+
+            // Manual dismiss on click
+            message.addEventListener('click', () => {
+                clearTimeout(autoDismissTimer);
+                App.dismissFlashMessage(message);
+            });
+
+            // Add close button functionality
+            message.addEventListener('mouseenter', () => {
+                clearTimeout(autoDismissTimer);
+            });
+        });
+    },
+
+    // Dismiss flash message with animation
+    dismissFlashMessage: (message) => {
+        message.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => {
+            if (message.parentNode) {
+                message.parentNode.removeChild(message);
+            }
+        }, 300);
     },
 
     // Cleanup function
