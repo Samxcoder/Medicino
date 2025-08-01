@@ -149,7 +149,7 @@ def diagnose_symptoms(symptoms_text):
             'confidence': 0,
             'severity': 'unknown',
             'description': 'Your symptoms do not strongly match any known conditions in our database.',
-            'precautions': 'Always seek professional medical advice for an accurate diagnosis.'
+            'precautions': 'Always seek professional medical advice for an accurate diagnosis.' 
         }
 
 @app.route('/')
@@ -254,7 +254,6 @@ def diagnose_api():
     return jsonify({'success': True, 'data': diagnosis_result})
 
 @app.route('/api/medicine/<medicine_name>')
-@login_required
 def get_medicine_info_api(medicine_name):
     """Get medicine information API endpoint."""
     conn = get_db_connection()
@@ -267,7 +266,6 @@ def get_medicine_info_api(medicine_name):
         return jsonify({'success': False, 'message': 'Medicine not found'})
 
 @app.route('/api/medicines')
-@login_required
 def list_medicines_api():
     """List all medicines API endpoint."""
     conn = get_db_connection()

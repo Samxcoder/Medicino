@@ -299,6 +299,7 @@ def create_database():
             'description': 'Infection of the urinary system requiring antibiotic treatment',
             'precautions': 'Stay hydrated, good hygiene, complete antibiotic course, seek medical care'
         }
+        
     ]
     
     cursor.executemany('''
@@ -314,7 +315,187 @@ def create_database():
     print("Populating medicines database...")
     
     medicines_data = [
-        # Pain Relief
+        # Pain Relief4
+        {
+            'name': 'Lisinopril',
+            'description': 'ACE inhibitor used to treat high blood pressure and heart failure',
+            'dosage': '10-40mg once daily',
+            'side_effects': 'Dizziness, headache, persistent cough',
+            'contraindications': 'Pregnancy, angioedema, renal artery stenosis',
+            'price': 14.50,
+            'category': 'Cardiovascular'
+        },
+        {
+            'name': 'Levothyroxine',
+            'description': 'Synthetic thyroid hormone for hypothyroidism',
+            'dosage': '25-100mcg daily',
+            'side_effects': 'Palpitations, weight loss, nervousness',
+            'contraindications': 'Thyrotoxicosis, uncorrected adrenal insufficiency',
+            'price': 12.00,
+            'category': 'Hormonal'
+        },
+        {
+            'name': 'Clopidogrel',
+            'description': 'Antiplatelet drug to prevent strokes and heart attacks',
+            'dosage': '75mg once daily',
+            'side_effects': 'Bleeding, rash, gastrointestinal upset',
+            'contraindications': 'Active bleeding, peptic ulcer, bleeding disorders',
+            'price': 18.90,
+            'category': 'Cardiovascular'
+        },
+        {
+            'name': 'Esomeprazole',
+            'description': 'Proton pump inhibitor for acid reflux and ulcers',
+            'dosage': '20-40mg daily before meals',
+            'side_effects': 'Nausea, flatulence, abdominal pain',
+            'contraindications': 'Liver disease, osteoporosis',
+            'price': 16.75,
+            'category': 'Digestive Health'
+        },
+        {
+            'name': 'Metronidazole',
+            'description': 'Antibiotic for bacterial and parasitic infections',
+            'dosage': '500mg every 8 hours for 7-10 days',
+            'side_effects': 'Metallic taste, nausea, dizziness',
+            'contraindications': 'Alcohol use, liver disease, pregnancy (1st trimester)',
+            'price': 11.00,
+            'category': 'Antibiotic'
+        },
+        {
+            'name': 'Azithromycin',
+            'description': 'Macrolide antibiotic for respiratory and skin infections',
+            'dosage': '500mg on day 1, then 250mg for 4 days',
+            'side_effects': 'Diarrhea, nausea, abdominal pain',
+            'contraindications': 'Liver problems, QT prolongation',
+            'price': 19.25,
+            'category': 'Antibiotic'
+        },
+        {
+            'name': 'Diclofenac',
+            'description': 'NSAID for pain, inflammation, and arthritis',
+            'dosage': '50mg 2-3 times daily',
+            'side_effects': 'Stomach pain, heartburn, nausea',
+            'contraindications': 'Ulcers, heart disease, kidney problems',
+            'price': 10.60,
+            'category': 'Pain Relief'
+        },
+        {
+            'name': 'Duloxetine',
+            'description': 'Antidepressant for depression and nerve pain',
+            'dosage': '30-60mg once daily',
+            'side_effects': 'Dry mouth, fatigue, nausea',
+            'contraindications': 'MAOI use, liver disease, uncontrolled glaucoma',
+            'price': 23.40,
+            'category': 'Mental Health'
+        },
+        {
+            'name': 'Bisoprolol',
+            'description': 'Beta-blocker for high blood pressure and heart failure',
+            'dosage': '5-10mg once daily',
+            'side_effects': 'Bradycardia, fatigue, cold extremities',
+            'contraindications': 'Asthma, heart block, severe bradycardia',
+            'price': 15.70,
+            'category': 'Cardiovascular'
+        },
+        {
+            'name': 'Montelukast',
+            'description': 'Leukotriene receptor antagonist for asthma and allergies',
+            'dosage': '10mg once daily in the evening',
+            'side_effects': 'Headache, abdominal pain, behavioral changes',
+            'contraindications': 'Liver impairment, mental health disorders',
+            'price': 17.80,
+            'category': 'Respiratory'
+        },
+        {
+            'name': 'Ranitidine',
+            'description': 'H2 blocker for ulcers and gastroesophageal reflux',
+            'dosage': '150mg twice daily',
+            'side_effects': 'Constipation, headache, dizziness',
+            'contraindications': 'Porphyria, hypersensitivity',
+            'price': 8.25,
+            'category': 'Digestive Health'
+        },
+        {
+            'name': 'Tamsulosin',
+            'description': 'Alpha-blocker for enlarged prostate (BPH)',
+            'dosage': '0.4mg once daily after the same meal',
+            'side_effects': 'Dizziness, retrograde ejaculation, nasal congestion',
+            'contraindications': 'Severe liver disease, orthostatic hypotension',
+            'price': 19.10,
+            'category': 'Urology'
+        },
+        {
+            'name': 'Risperidone',
+            'description': 'Antipsychotic for schizophrenia and bipolar disorder',
+            'dosage': '1-6mg daily depending on condition',
+            'side_effects': 'Weight gain, drowsiness, restlessness',
+            'contraindications': 'Dementia-related psychosis, heart conditions',
+            'price': 25.00,
+            'category': 'Mental Health'
+        },
+        {
+            'name': 'Fluconazole',
+            'description': 'Antifungal for yeast and fungal infections',
+            'dosage': '150mg single dose or 50-200mg daily',
+            'side_effects': 'Nausea, abdominal pain, headache',
+            'contraindications': 'Liver disease, QT prolongation',
+            'price': 13.90,
+            'category': 'Antifungal'
+        },
+        {
+            'name': 'Sildenafil',
+            'description': 'Used for erectile dysfunction and pulmonary hypertension',
+            'dosage': '50mg one hour before activity',
+            'side_effects': 'Flushing, headache, vision changes',
+            'contraindications': 'Nitrate medications, severe heart conditions',
+            'price': 27.50,
+            'category': 'Men’s Health'
+        },
+        {
+            'name': 'Pregabalin',
+            'description': 'Used for nerve pain, epilepsy, and anxiety',
+            'dosage': '75-150mg twice daily',
+            'side_effects': 'Dizziness, weight gain, dry mouth',
+            'contraindications': 'Renal impairment, history of substance abuse',
+            'price': 22.80,
+            'category': 'Neurology'
+        },
+        {
+            'name': 'Miconazole',
+            'description': 'Topical antifungal for skin infections',
+            'dosage': 'Apply 2 times daily for 2-4 weeks',
+            'side_effects': 'Skin irritation, burning, redness',
+            'contraindications': 'Allergy to imidazoles',
+            'price': 9.50,
+            'category': 'Dermatology'
+        },
+        {
+            'name': 'Ciprofloxacin',
+            'description': 'Fluoroquinolone antibiotic for various infections',
+            'dosage': '250-750mg every 12 hours',
+            'side_effects': 'Nausea, tendon rupture, rash',
+            'contraindications': 'Tendon disorders, myasthenia gravis',
+            'price': 20.60,
+            'category': 'Antibiotic'
+        },
+        {
+            'name': 'Finasteride',
+            'description': 'Used for BPH and hair loss',
+            'dosage': '1-5mg once daily',
+            'side_effects': 'Decreased libido, erectile dysfunction, breast tenderness',
+            'contraindications': 'Pregnancy (Category X), liver disease',
+            'price': 18.00,
+            'category': 'Men’s Health'
+        },
+        {
+            'name': 'Zolpidem',
+            'description': 'Sedative-hypnotic for short-term treatment of insomnia',
+            'dosage': '5-10mg at bedtime',
+            'side_effects': 'Drowsiness, dizziness, memory loss',
+            'contraindications': 'Severe liver impairment, sleep apnea',
+            'price': 24.20,
+            'category': 'Sleep Aid'
+        },
         {
             'name': 'Paracetamol',
             'description': 'Over-the-counter pain reliever and fever reducer',
@@ -592,7 +773,7 @@ def create_database():
             'contraindications': 'Shellfish allergy, diabetes, pregnancy',
             'price': 21.99,
             'category': 'Joint Health'
-        }
+        },
     ]
     
     cursor.executemany('''
