@@ -794,11 +794,14 @@ body {
     padding: var(--space-2xl);
     max-width: 600px;
     width: 90%;
-    max-height: 80vh;
-    overflow-y: auto;
+    height: 80vh !important;
+    max-height: 80vh !important;
+    overflow-y: auto !important;
     box-shadow: var(--shadow-2xl);
     border: 1px solid var(--border-light);
     animation: slideInUp 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
 }
 
 .modal-header {
@@ -835,8 +838,9 @@ body {
 .modal-body {
     color: #4a5568;
     line-height: 1.6;
-    overflow-y: auto;
-    max-height: 60vh;
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    min-height: 0 !important;
 }
 
 /* Emergency Section */
@@ -1481,4 +1485,9 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--border-dark);
+}
+
+.history-list {
+    overflow-y: auto;
+    max-height: 100%;
 }

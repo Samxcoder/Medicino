@@ -574,7 +574,7 @@ const HistoryHandler = {
                 </div>
             `;
         } else {
-            historyContent = history.map((record, index) => `
+            historyContent = `<div class="history-list">` + history.map((record, index) => `
                 <div class="history-item">
                     <div class="history-header">
                         <strong>Diagnosis #${history.length - index}</strong>
@@ -588,7 +588,7 @@ const HistoryHandler = {
                         <p><strong>Medicine:</strong> ${record.medicine_suggestion}</p>
                     </div>
                 </div>
-            `).join('');
+            `).join('') + `</div>`;
         }
 
         modal.innerHTML = `
