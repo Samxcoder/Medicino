@@ -28,17 +28,20 @@
             {% endif %}
         {% endwith %}
         
-        <!-- Header -->
+        <!-- Modern Header -->
         <header class="header">
             <div class="header-content">
                 <div class="header-left">
-                    <h1><i class="fas fa-user-md"></i> MEDICINO</h1>
+                    <h1><i class="fas fa-heartbeat"></i> MEDICINO</h1>
                     <p class="subtitle">AI-Powered Medical Assistant for Smart Healthcare</p>
                 </div>
                 <div class="header-right">
                     {% if current_user.is_authenticated %}
                         <div class="user-info">
-                            <span class="welcome-text">Welcome, {{ current_user.username }}!</span>
+                            <span class="welcome-text">
+                                <i class="fas fa-user-circle"></i>
+                                Welcome, {{ current_user.username }}!
+                            </span>
                             <a href="{{ url_for('logout') }}" class="auth-btn logout-btn">
                                 <i class="fas fa-sign-out-alt"></i>
                                 Logout
@@ -60,19 +63,22 @@
             </div>
         </header>
 
-        <!-- Symptom Diagnosis Section -->
+        <!-- Modern Symptom Diagnosis Section -->
         <section class="glass-card">
             <h2 class="card-title">
-                <i class="fas fa-brain"></i>
+                <i class="fas fa-stethoscope"></i>
                 Smart Symptom Diagnosis
             </h2>
-            <p class="mb-2" style="color: var(--text-secondary); line-height: 1.6;">
+            <p class="mb-2" style="color: var(--text-secondary); line-height: 1.6; font-size: var(--font-size-sm);">
                 Describe your symptoms in detail and let our AI-powered system provide you with intelligent analysis,
                 confidence scoring, and personalized treatment recommendations.
             </p>
 
             <div class="input-group">
-                <label for="symptomsInput">Enter Your Symptoms</label>
+                <label for="symptomsInput">
+                    <i class="fas fa-clipboard-list"></i>
+                    Enter Your Symptoms
+                </label>
                 <textarea
                     id="symptomsInput"
                     class="modern-input"
@@ -81,23 +87,23 @@
                     style="resize: vertical; min-height: 120px;"
                 ></textarea>
                 
-                <!-- Simple Symptom Suggestions -->
+                <!-- Enhanced Symptom Suggestions -->
                 <div class="symptom-suggestions">
-                    <p style="margin: 10px 0 5px 0; color: var(--text-secondary); font-size: 14px;">
+                    <p style="margin: 10px 0 5px 0; color: var(--text-secondary); font-size: var(--font-size-sm);">
                         <i class="fas fa-lightbulb"></i> Common symptoms (click to add):
                     </p>
                     <div class="symptom-tags">
-                        <span class="symptom-tag" data-symptom="fever">fever</span>
-                        <span class="symptom-tag" data-symptom="headache">headache</span>
-                        <span class="symptom-tag" data-symptom="cough">cough</span>
-                        <span class="symptom-tag" data-symptom="sore throat">sore throat</span>
-                        <span class="symptom-tag" data-symptom="stomach pain">stomach pain</span>
-                        <span class="symptom-tag" data-symptom="nausea">nausea</span>
-                        <span class="symptom-tag" data-symptom="vomiting">vomiting</span>
-                        <span class="symptom-tag" data-symptom="fatigue">fatigue</span>
-                        <span class="symptom-tag" data-symptom="chest pain">chest pain</span>
-                        <span class="symptom-tag" data-symptom="shortness of breath">shortness of breath</span>
-                        <span class="symptom-tag" data-symptom="joint pain">joint pain</span>
+                        <span class="symptom-tag" data-symptom="fever">🔥 fever</span>
+                        <span class="symptom-tag" data-symptom="headache">💢 headache</span>
+                        <span class="symptom-tag" data-symptom="cough">🤧 cough</span>
+                        <span class="symptom-tag" data-symptom="sore throat">😷 sore throat</span>
+                        <span class="symptom-tag" data-symptom="stomach pain">🤢 stomach pain</span>
+                        <span class="symptom-tag" data-symptom="nausea">🤮 nausea</span>
+                        <span class="symptom-tag" data-symptom="vomiting">🤮 vomiting</span>
+                        <span class="symptom-tag" data-symptom="fatigue">😴 fatigue</span>
+                        <span class="symptom-tag" data-symptom="chest pain">💔 chest pain</span>
+                        <span class="symptom-tag" data-symptom="shortness of breath">😰 shortness of breath</span>
+                        <span class="symptom-tag" data-symptom="joint pain">🦴 joint pain</span>
                         <span class="symptom-tag" data-symptom="skin rash">skin rash</span>
                     </div>
                 </div>
@@ -105,7 +111,7 @@
 
             <div class="text-center">
                 <button id="diagnoseBtn" class="btn btn-primary">
-                    <i class="fas fa-stethoscope"></i>
+                    <i class="fas fa-brain"></i>
                     Analyze Symptoms
                 </button>
                 <button id="voiceBtn" class="btn btn-voice">
@@ -124,11 +130,11 @@
                 <div class="loader-text">Analyzing your symptoms with AI...</div>
             </div>
 
-            <!-- Results Section -->
+            <!-- Enhanced Results Section -->
             <div id="diagnosisResult" class="results-card hidden">
-                <h3 style="margin-bottom: 1.5rem; color: #667eea;">
+                <h3 style="margin-bottom: 1.5rem; color: var(--primary); font-weight: 600;">
                     <i class="fas fa-clipboard-check"></i>
-                    Diagnosis Results
+                    AI Diagnosis Results
                 </h3>
 
                 <div class="result-item">
@@ -169,19 +175,22 @@
             </div>
         </section>
 
-        <!-- Medicine Information Section -->
+        <!-- Modern Medicine Information Section -->
         <section class="glass-card">
             <h2 class="card-title">
-                <i class="fas fa-search"></i>
+                <i class="fas fa-pills"></i>
                 Medicine Database
             </h2>
-            <p class="mb-2" style="color: var(--text-secondary); line-height: 1.6;">
+            <p class="mb-2" style="color: var(--text-secondary); line-height: 1.6; font-size: var(--font-size-sm);">
                 Search our comprehensive medicine database for detailed information including dosage,
                 side effects, contraindications, and current pricing.
             </p>
 
             <div class="input-group">
-                <label for="medicineInput">Medicine Name</label>
+                <label for="medicineInput">
+                    <i class="fas fa-search"></i>
+                    Medicine Name
+                </label>
                 <input
                     type="text"
                     id="medicineInput"
