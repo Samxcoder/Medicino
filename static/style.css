@@ -1510,3 +1510,51 @@ body {
 .mb-2 { margin-bottom: 2rem; }
 .mt-1 { margin-top: 1rem; }
 .mt-2 { margin-top: 2rem; }
+
+/* Symptom Suggestions */
+.symptom-suggestions {
+    margin-top: 15px;
+}
+
+.symptom-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.symptom-tag {
+    display: inline-block;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+    color: #666;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.symptom-tag:hover {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+}
+
+.symptom-tag:active {
+    transform: translateY(0);
+}
+
+/* Mobile responsive for symptom tags */
+@media (max-width: 768px) {
+    .symptom-tags {
+        gap: 6px;
+    }
+    
+    .symptom-tag {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+}

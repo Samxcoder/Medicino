@@ -113,53 +113,15 @@ def init_db():
 
 
 def diagnose_symptoms(symptoms_text):
-    """Enhanced AI-like symptom diagnosis logic with improved matching."""
+    """Simple and user-friendly symptom diagnosis logic."""
     conn = get_db_connection()
     conditions = conn.execute("SELECT * FROM symptoms_database").fetchall()
     conn.close()
 
-    # Clean and normalize input symptoms
-    input_symptoms = [s.strip().lower() for s in re.split(r'[,\s]+', symptoms_text.lower()) if s.strip()]
+    # Simple symptom processing - just split by commas and clean
+    input_symptoms = [s.strip().lower() for s in symptoms_text.split(',') if s.strip()]
     
-    # Remove common words that don't help with diagnosis
-    stop_words = {'and', 'or', 'the', 'a', 'an', 'with', 'have', 'has', 'had', 'been', 'being', 'is', 'are', 'was', 'were', 'be', 'am', 'i', 'my', 'me', 'you', 'your', 'he', 'she', 'it', 'they', 'them', 'their', 'we', 'us', 'our', 'persistent', 'severe', 'mild', 'chronic', 'acute'}
-    input_symptoms = [s for s in input_symptoms if s not in stop_words and len(s) > 2]
-    
-    # Add synonyms for better matching
-    symptom_synonyms = {
-        'fever': ['fever', 'temperature', 'high temperature', 'pyrexia'],
-        'headache': ['headache', 'head pain', 'migraine'],
-        'cough': ['cough', 'coughing', 'dry cough', 'wet cough'],
-        'pain': ['pain', 'ache', 'soreness', 'discomfort'],
-        'nausea': ['nausea', 'sick', 'queasy'],
-        'vomiting': ['vomiting', 'throw up', 'puke'],
-        'diarrhea': ['diarrhea', 'loose stools', 'watery stools'],
-        'fatigue': ['fatigue', 'tired', 'exhaustion', 'weakness'],
-        'shortness': ['shortness', 'breathlessness', 'difficulty breathing'],
-        'chest': ['chest', 'breastbone'],
-        'stomach': ['stomach', 'abdomen', 'belly'],
-        'joint': ['joint', 'arthritis'],
-        'swelling': ['swelling', 'inflammation', 'edema'],
-        'stiffness': ['stiffness', 'rigidity'],
-        'itching': ['itching', 'itchy', 'pruritus'],
-        'rash': ['rash', 'skin rash', 'eruption'],
-        'dizziness': ['dizziness', 'vertigo', 'lightheaded'],
-        'blurred': ['blurred', 'blurry', 'vision problems'],
-        'thirst': ['thirst', 'thirsty', 'dehydration'],
-        'urination': ['urination', 'frequent urination', 'polyuria']
-    }
-    
-    # Expand input symptoms with synonyms
-    expanded_symptoms = []
-    for symptom in input_symptoms:
-        expanded_symptoms.append(symptom)
-        for key, synonyms in symptom_synonyms.items():
-            if symptom in synonyms:
-                expanded_symptoms.extend(synonyms)
-                break
-    
-    input_symptoms = list(set(expanded_symptoms))  # Remove duplicates
-    
+    # Simple keyword matching - no complex algorithms
     best_match = None
     best_score = 0
     all_matches = []
@@ -167,69 +129,54 @@ def diagnose_symptoms(symptoms_text):
     for condition in conditions:
         condition_symptoms = [s.strip().lower() for s in condition['symptoms'].split(',')]
         
-        # Enhanced matching logic
+        # Simple matching: count how many input symptoms match condition symptoms
         matches = 0
         matched_symptoms = []
         
         for input_symptom in input_symptoms:
             for condition_symptom in condition_symptoms:
-                # Check for exact matches, partial matches, or synonym matches
-                if (input_symptom in condition_symptom or 
-                    condition_symptom in input_symptom or
-                    input_symptom == condition_symptom or
-                    any(syn in condition_symptom for syn in symptom_synonyms.get(input_symptom, []))):
+                # Simple contains check
+                if input_symptom in condition_symptom or condition_symptom in input_symptom:
                     matches += 1
                     matched_symptoms.append(condition_symptom)
                     break
         
-        # Calculate score with multiple factors
-        if condition_symptoms:
-            # Base score from symptom matches
-            symptom_score = matches / len(condition_symptoms)
-            
-            # Input coverage score
-            input_coverage = matches / len(input_symptoms) if input_symptoms else 0
-            
-            # Weighted final score (prioritize symptom matches)
-            final_score = (symptom_score * 0.6) + (input_coverage * 0.4)
-            
-            # Bonus for exact matches
-            exact_matches = sum(1 for s in input_symptoms if s in condition_symptoms)
-            if exact_matches > 0:
-                final_score += (exact_matches * 0.1)
+        # Simple scoring: percentage of input symptoms that matched
+        if input_symptoms:
+            score = matches / len(input_symptoms)
         else:
-            final_score = 0
+            score = 0
         
         all_matches.append({
             'condition': condition['condition_name'],
-            'score': final_score,
+            'score': score,
             'matches': matches,
             'matched_symptoms': matched_symptoms,
             'severity': condition['severity_level']
         })
         
-        if final_score > best_score:
-            best_score = final_score
+        if score > best_score:
+            best_score = score
             best_match = condition
     
-    # Lower threshold and provide better fallback
-    if best_match and best_score > 0.05:  # Very low threshold for better matching
+    # Simple threshold: if more than 50% of symptoms match, show result
+    if best_match and best_score >= 0.5:
         return {
             'disease': best_match['condition_name'],
             'ayurvedic': best_match['ayurvedic_remedy'],
             'medicine': best_match['medicine_suggestion'],
-            'confidence': round(best_score * 100, 2),
+            'confidence': round(best_score * 100, 0),  # Round to whole number
             'severity': best_match['severity_level'],
             'description': best_match['description'],
             'precautions': best_match['precautions']
         }
     else:
-        # Return top 5 matches with better suggestions
-        top_matches = sorted(all_matches, key=lambda x: x['score'], reverse=True)[:5]
+        # Show top 3 matches with simple format
+        top_matches = sorted(all_matches, key=lambda x: x['score'], reverse=True)[:3]
         suggestions = []
         
         for match in top_matches:
-            if match['score'] > 0.01:  # Very low threshold for suggestions
+            if match['score'] > 0:  # Show any match
                 severity_emoji = {
                     'mild': '🟢',
                     'moderate': '🟡', 
@@ -237,27 +184,27 @@ def diagnose_symptoms(symptoms_text):
                     'unknown': '❓'
                 }.get(match['severity'], '❓')
                 
-                suggestions.append(f"{severity_emoji} {match['condition']} ({match['score']:.1%})")
+                suggestions.append(f"{severity_emoji} {match['condition']}")
         
         if suggestions:
             suggestion_text = "\n• " + "\n• ".join(suggestions)
             return {
-                'disease': 'Multiple possible conditions',
-                'ayurvedic': 'Please consult an Ayurvedic practitioner for personalized treatment based on your specific symptoms.',
-                'medicine': 'Please consult a healthcare professional for proper diagnosis and treatment.',
-                'confidence': 0,
-                'severity': 'unknown',
-                'description': f'Your symptoms could indicate several conditions:\n{suggestion_text}\n\nPlease provide more specific symptoms for better diagnosis.',
-                'precautions': 'Always seek professional medical advice for an accurate diagnosis.' 
-            }
-        else:
-            return {
-                'disease': 'Unable to determine condition',
+                'disease': 'Possible conditions found',
                 'ayurvedic': 'Please consult an Ayurvedic practitioner for personalized treatment.',
                 'medicine': 'Please consult a healthcare professional for proper diagnosis.',
                 'confidence': 0,
                 'severity': 'unknown',
-                'description': 'Your symptoms do not match any known conditions in our database. Please try describing your symptoms in more detail.',
+                'description': f'Your symptoms might indicate:\n{suggestion_text}\n\nTry adding more symptoms for better results.',
+                'precautions': 'Always seek professional medical advice for an accurate diagnosis.' 
+            }
+        else:
+            return {
+                'disease': 'No matching conditions found',
+                'ayurvedic': 'Please consult an Ayurvedic practitioner for personalized treatment.',
+                'medicine': 'Please consult a healthcare professional for proper diagnosis.',
+                'confidence': 0,
+                'severity': 'unknown',
+                'description': 'Try describing your symptoms in simple terms like: fever, headache, cough, stomach pain, etc.',
                 'precautions': 'Always seek professional medical advice for an accurate diagnosis.' 
             }
 

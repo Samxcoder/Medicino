@@ -885,6 +885,32 @@ const EventListeners = {
             symptomsInput.style.height = Math.min(symptomsInput.scrollHeight, 200) + 'px';
         });
 
+        // Symptom tag functionality
+        const symptomTags = document.querySelectorAll('.symptom-tag');
+        symptomTags.forEach(tag => {
+            tag.addEventListener('click', () => {
+                const symptom = tag.getAttribute('data-symptom');
+                const currentValue = symptomsInput.value.trim();
+                
+                if (currentValue) {
+                    // Add comma and space if there's already content
+                    symptomsInput.value = currentValue + ', ' + symptom;
+                } else {
+                    // Just add the symptom if input is empty
+                    symptomsInput.value = symptom;
+                }
+                
+                // Trigger input event to resize textarea
+                symptomsInput.dispatchEvent(new Event('input'));
+                
+                // Add visual feedback
+                tag.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    tag.style.transform = '';
+                }, 150);
+            });
+        });
+
         // Voice button state management
         document.getElementById('voiceBtn').addEventListener('click', () => {
             if (AppState.isListening) {
