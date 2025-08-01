@@ -280,6 +280,7 @@ const VoiceService = {
 // Diagnosis Handler
 const DiagnosisHandler = {
     diagnose: async () => {
+        console.log('🚀 DiagnosisHandler.diagnose() called');
         const symptomsInput = document.getElementById('symptomsInput');
         const symptoms = symptomsInput.value.trim();
 
@@ -385,6 +386,7 @@ const DiagnosisHandler = {
 // Medicine Handler
 const MedicineHandler = {
     search: async () => {
+        console.log('🚀 MedicineHandler.search() called');
         const medicineInput = document.getElementById('medicineInput');
         const medicineName = medicineInput.value.trim();
 
@@ -437,6 +439,7 @@ const MedicineHandler = {
     },
 
     showAll: async () => {
+        console.log('🚀 MedicineHandler.showAll() called');
         Utils.showLoader('medicineLoader');
         Utils.hide('medicineInfoResult');
 
@@ -466,6 +469,7 @@ const MedicineHandler = {
     },
 
     displayMedicineInfo: (medicines) => {
+        console.log('🚀 MedicineHandler.displayMedicineInfo() called');
         const resultDiv = document.getElementById('medicineInfoResult');
 
         if (!medicines || medicines.length === 0) {
@@ -539,6 +543,7 @@ const MedicineHandler = {
 // History Handler
 const HistoryHandler = {
     show: async () => {
+        console.log('🚀 HistoryHandler.show() called');
         try {
             Utils.showNotification('Loading diagnosis history...', 'info');
             const response = await ApiService.getHistory();
@@ -639,6 +644,7 @@ const HistoryHandler = {
 // Emergency Guide Handler
 const EmergencyHandler = {
     show: () => {
+        console.log('🚀 EmergencyHandler.show() called');
         const emergencyInfo = `
             <div class="emergency-modal">
                 <div class="modal-overlay" onclick="EmergencyHandler.close()"></div>
@@ -722,6 +728,7 @@ const EmergencyHandler = {
 // About Handler
 const AboutHandler = {
     show: () => {
+        console.log('🚀 AboutHandler.show() called');
         const aboutInfo = `
             <div class="about-modal">
                 <div class="modal-overlay" onclick="AboutHandler.close()"></div>
@@ -864,100 +871,205 @@ const BackendSwitcher = {
 // Event Listeners Setup
 const EventListeners = {
     init: () => {
-        // Diagnosis functionality
-        document.getElementById('diagnoseBtn').addEventListener('click', DiagnosisHandler.diagnose);
-        document.getElementById('voiceBtn').addEventListener('click', VoiceService.start);
-        document.getElementById('clearBtn').addEventListener('click', DiagnosisHandler.clear);
-
-        // Medicine functionality
-        document.getElementById('searchMedicineBtn').addEventListener('click', MedicineHandler.search);
-        document.getElementById('showAllBtn').addEventListener('click', MedicineHandler.showAll);
-
-        // Quick actions
-        document.getElementById('historyBtn').addEventListener('click', HistoryHandler.show);
-        document.getElementById('emergencyBtn').addEventListener('click', EmergencyHandler.show);
-        document.getElementById('aboutBtn').addEventListener('click', AboutHandler.show);
-
-        // Enter key support for inputs
-        document.getElementById('symptomsInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                DiagnosisHandler.diagnose();
-            }
-        });
-
-        document.getElementById('medicineInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                MedicineHandler.search();
-            }
-        });
-
-        // Auto-resize textarea
-        const symptomsInput = document.getElementById('symptomsInput');
-        symptomsInput.addEventListener('input', () => {
-            symptomsInput.style.height = 'auto';
-            symptomsInput.style.height = Math.min(symptomsInput.scrollHeight, 200) + 'px';
-        });
-
-        // Symptom tag functionality
-        const symptomTags = document.querySelectorAll('.symptom-tag');
-        symptomTags.forEach(tag => {
-            tag.addEventListener('click', () => {
-                const symptom = tag.getAttribute('data-symptom');
-                const currentValue = symptomsInput.value.trim();
-                
-                if (currentValue) {
-                    // Add comma and space if there's already content
-                    symptomsInput.value = currentValue + ', ' + symptom;
-                } else {
-                    // Just add the symptom if input is empty
-                    symptomsInput.value = symptom;
-                }
-                
-                // Trigger input event to resize textarea
-                symptomsInput.dispatchEvent(new Event('input'));
-                
-                // Add visual feedback
-                tag.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    tag.style.transform = '';
-                }, 150);
-            });
-        });
-
-        // Voice button state management
-        document.getElementById('voiceBtn').addEventListener('click', () => {
-            if (AppState.isListening) {
-                VoiceService.stop();
+        console.log('🔧 Initializing event listeners...');
+        
+        try {
+            // Diagnosis functionality
+            const diagnoseBtn = document.getElementById('diagnoseBtn');
+            const voiceBtn = document.getElementById('voiceBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            
+            if (diagnoseBtn) {
+                diagnoseBtn.addEventListener('click', DiagnosisHandler.diagnose);
+                console.log('✅ diagnoseBtn listener added');
             } else {
-                VoiceService.start();
+                console.error('❌ diagnoseBtn not found');
             }
-        });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            // Ctrl+Enter for diagnosis
-            if (e.ctrlKey && e.key === 'Enter') {
-                e.preventDefault();
-                DiagnosisHandler.diagnose();
+            
+            if (voiceBtn) {
+                voiceBtn.addEventListener('click', VoiceService.start);
+                console.log('✅ voiceBtn listener added');
+            } else {
+                console.error('❌ voiceBtn not found');
+            }
+            
+            if (clearBtn) {
+                clearBtn.addEventListener('click', DiagnosisHandler.clear);
+                console.log('✅ clearBtn listener added');
+            } else {
+                console.error('❌ clearBtn not found');
             }
 
-            // Ctrl+Shift+V for voice input
-            if (e.ctrlKey && e.shiftKey && e.key === 'V') {
-                e.preventDefault();
-                VoiceService.start();
+            // Medicine functionality
+            const searchMedicineBtn = document.getElementById('searchMedicineBtn');
+            const showAllBtn = document.getElementById('showAllBtn');
+            
+            if (searchMedicineBtn) {
+                searchMedicineBtn.addEventListener('click', MedicineHandler.search);
+                console.log('✅ searchMedicineBtn listener added');
+            } else {
+                console.error('❌ searchMedicineBtn not found');
+            }
+            
+            if (showAllBtn) {
+                showAllBtn.addEventListener('click', MedicineHandler.showAll);
+                console.log('✅ showAllBtn listener added');
+            } else {
+                console.error('❌ showAllBtn not found');
             }
 
-            // Escape to close modals
-            if (e.key === 'Escape') {
-                HistoryHandler.closeModal();
-                EmergencyHandler.close();
-                AboutHandler.close();
+            // Quick actions - THE THREE BUTTONS THAT AREN'T WORKING
+            const historyBtn = document.getElementById('historyBtn');
+            const emergencyBtn = document.getElementById('emergencyBtn');
+            const aboutBtn = document.getElementById('aboutBtn');
+            
+            if (historyBtn) {
+                historyBtn.addEventListener('click', (e) => {
+                    console.log('🔘 historyBtn clicked!');
+                    e.target.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        e.target.style.transform = '';
+                    }, 150);
+                    HistoryHandler.show();
+                });
+                console.log('✅ historyBtn listener added');
+            } else {
+                console.error('❌ historyBtn not found');
             }
-        });
+            
+            if (emergencyBtn) {
+                emergencyBtn.addEventListener('click', (e) => {
+                    console.log('🔘 emergencyBtn clicked!');
+                    e.target.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        e.target.style.transform = '';
+                    }, 150);
+                    EmergencyHandler.show();
+                });
+                console.log('✅ emergencyBtn listener added');
+            } else {
+                console.error('❌ emergencyBtn not found');
+            }
+            
+            if (aboutBtn) {
+                aboutBtn.addEventListener('click', (e) => {
+                    console.log('🔘 aboutBtn clicked!');
+                    e.target.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        e.target.style.transform = '';
+                    }, 150);
+                    AboutHandler.show();
+                });
+                console.log('✅ aboutBtn listener added');
+            } else {
+                console.error('❌ aboutBtn not found');
+            }
 
-        console.log('✅ Event listeners initialized');
+            // Enter key support for inputs
+            const symptomsInput = document.getElementById('symptomsInput');
+            const medicineInput = document.getElementById('medicineInput');
+            
+            if (symptomsInput) {
+                symptomsInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        DiagnosisHandler.diagnose();
+                    }
+                });
+                console.log('✅ symptomsInput listener added');
+            } else {
+                console.error('❌ symptomsInput not found');
+            }
+
+            if (medicineInput) {
+                medicineInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        MedicineHandler.search();
+                    }
+                });
+                console.log('✅ medicineInput listener added');
+            } else {
+                console.error('❌ medicineInput not found');
+            }
+
+            // Auto-resize textarea
+            if (symptomsInput) {
+                symptomsInput.addEventListener('input', () => {
+                    symptomsInput.style.height = 'auto';
+                    symptomsInput.style.height = Math.min(symptomsInput.scrollHeight, 200) + 'px';
+                });
+            }
+
+            // Symptom tag functionality
+            const symptomTags = document.querySelectorAll('.symptom-tag');
+            console.log(`Found ${symptomTags.length} symptom tags`);
+            
+            symptomTags.forEach((tag, index) => {
+                tag.addEventListener('click', () => {
+                    const symptom = tag.getAttribute('data-symptom');
+                    const currentValue = symptomsInput ? symptomsInput.value.trim() : '';
+                    
+                    if (symptomsInput) {
+                        if (currentValue) {
+                            // Add comma and space if there's already content
+                            symptomsInput.value = currentValue + ', ' + symptom;
+                        } else {
+                            // Just add the symptom if input is empty
+                            symptomsInput.value = symptom;
+                        }
+                        
+                        // Trigger input event to resize textarea
+                        symptomsInput.dispatchEvent(new Event('input'));
+                    }
+                    
+                    // Add visual feedback
+                    tag.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        tag.style.transform = '';
+                    }, 150);
+                });
+                console.log(`✅ Symptom tag ${index + 1} listener added`);
+            });
+
+            // Voice button state management
+            if (voiceBtn) {
+                voiceBtn.addEventListener('click', () => {
+                    if (AppState.isListening) {
+                        VoiceService.stop();
+                    } else {
+                        VoiceService.start();
+                    }
+                });
+            }
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Ctrl+Enter for diagnosis
+                if (e.ctrlKey && e.key === 'Enter') {
+                    e.preventDefault();
+                    DiagnosisHandler.diagnose();
+                }
+
+                // Ctrl+Shift+V for voice input
+                if (e.ctrlKey && e.shiftKey && e.key === 'V') {
+                    e.preventDefault();
+                    VoiceService.start();
+                }
+
+                // Escape to close modals
+                if (e.key === 'Escape') {
+                    HistoryHandler.closeModal();
+                    EmergencyHandler.close();
+                    AboutHandler.close();
+                }
+            });
+
+            console.log('✅ All event listeners initialized successfully');
+
+        } catch (error) {
+            console.error('❌ Error initializing event listeners:', error);
+        }
     }
 };
 
@@ -1088,7 +1200,22 @@ window.addEventListener('unhandledrejection', (e) => {
 });
 
 // Application lifecycle
-window.addEventListener('load', App.init);
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('📄 DOM Content Loaded - Initializing App...');
+    App.init();
+});
+
+window.addEventListener('load', () => {
+    console.log('🌐 Window Loaded - App should be ready...');
+    // Fallback initialization if DOMContentLoaded didn't work
+    if (!document.getElementById('historyBtn') || !document.getElementById('emergencyBtn') || !document.getElementById('aboutBtn')) {
+        console.log('🔄 Re-initializing event listeners...');
+        setTimeout(() => {
+            EventListeners.init();
+        }, 100);
+    }
+});
+
 window.addEventListener('beforeunload', App.cleanup);
 
 // Periodic performance monitoring (development only)
