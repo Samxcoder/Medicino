@@ -113,7 +113,7 @@ def init_db():
 
 
 def diagnose_symptoms(symptoms_text):
-    """Simple and user-friendly symptom diagnosis logic."""
+    """Enhanced symptom diagnosis logic that returns all possible diseases for minimal symptoms."""
     conn = get_db_connection()
     conditions = conn.execute("SELECT * FROM symptoms_database").fetchall()
     conn.close()
@@ -121,15 +121,27 @@ def diagnose_symptoms(symptoms_text):
     # Simple symptom processing - just split by commas and clean
     input_symptoms = [s.strip().lower() for s in symptoms_text.split(',') if s.strip()]
     
-    # Simple keyword matching - no complex algorithms
+    # If no symptoms provided, return early
+    if not input_symptoms:
+        return {
+            'disease': 'No symptoms provided',
+            'ayurvedic': 'Please enter your symptoms to get a diagnosis.',
+            'medicine': 'Please enter your symptoms to get medicine suggestions.',
+            'confidence': 0,
+            'severity': 'unknown',
+            'description': 'Please describe your symptoms in simple terms like: fever, headache, cough, stomach pain, etc.',
+            'precautions': 'Always seek professional medical advice for an accurate diagnosis.'
+        }
+    
+    # Find all conditions that match ANY of the input symptoms
+    all_matches = []
     best_match = None
     best_score = 0
-    all_matches = []
 
     for condition in conditions:
         condition_symptoms = [s.strip().lower() for s in condition['symptoms'].split(',')]
         
-        # Simple matching: count how many input symptoms match condition symptoms
+        # Count how many input symptoms match condition symptoms
         matches = 0
         matched_symptoms = []
         
@@ -141,42 +153,50 @@ def diagnose_symptoms(symptoms_text):
                     matched_symptoms.append(condition_symptom)
                     break
         
-        # Simple scoring: percentage of input symptoms that matched
+        # Calculate score: percentage of input symptoms that matched
         if input_symptoms:
             score = matches / len(input_symptoms)
         else:
             score = 0
         
-        all_matches.append({
-            'condition': condition['condition_name'],
-            'score': score,
-            'matches': matches,
-            'matched_symptoms': matched_symptoms,
-            'severity': condition['severity_level']
-        })
-        
-        if score > best_score:
-            best_score = score
-            best_match = condition
+        # Include ALL conditions that have at least one matching symptom
+        if matches > 0:
+            all_matches.append({
+                'condition': condition['condition_name'],
+                'score': score,
+                'matches': matches,
+                'matched_symptoms': matched_symptoms,
+                'severity': condition['severity_level'],
+                'ayurvedic': condition['ayurvedic_remedy'],
+                'medicine': condition['medicine_suggestion'],
+                'description': condition['description'],
+                'precautions': condition['precautions']
+            })
+            
+            if score > best_score:
+                best_score = score
+                best_match = condition
     
-    # Simple threshold: if more than 50% of symptoms match, show result
-    if best_match and best_score >= 0.5:
+    # Sort matches by score (highest first)
+    all_matches.sort(key=lambda x: x['score'], reverse=True)
+    
+    # If we have a very strong match (80% or more symptoms match), show it as primary
+    if best_match and best_score >= 0.8:
         return {
             'disease': best_match['condition_name'],
             'ayurvedic': best_match['ayurvedic_remedy'],
             'medicine': best_match['medicine_suggestion'],
-            'confidence': round(best_score * 100, 0),  # Round to whole number
+            'confidence': round(best_score * 100, 0),
             'severity': best_match['severity_level'],
             'description': best_match['description'],
             'precautions': best_match['precautions']
         }
     else:
-        # Show top 3 matches with simple format
-        top_matches = sorted(all_matches, key=lambda x: x['score'], reverse=True)[:3]
-        suggestions = []
-        
-        for match in top_matches:
-            if match['score'] > 0:  # Show any match
+        # Return ALL possible conditions that match the symptoms
+        if all_matches:
+            # Create a comprehensive list of all matching conditions
+            condition_list = []
+            for match in all_matches:
                 severity_emoji = {
                     'mild': '🟢',
                     'moderate': '🟡', 
@@ -184,18 +204,25 @@ def diagnose_symptoms(symptoms_text):
                     'unknown': '❓'
                 }.get(match['severity'], '❓')
                 
-                suggestions.append(f"{severity_emoji} {match['condition']}")
-        
-        if suggestions:
-            suggestion_text = "\n• " + "\n• ".join(suggestions)
+                confidence_text = f" ({round(match['score'] * 100, 0)}% match)"
+                condition_list.append(f"{severity_emoji} {match['condition']}{confidence_text}")
+            
+            # Limit to top 10 to avoid overwhelming the user
+            top_conditions = condition_list[:10]
+            condition_text = "\n• " + "\n• ".join(top_conditions)
+            
+            # If there are more than 10 matches, add a note
+            if len(all_matches) > 10:
+                condition_text += f"\n\n... and {len(all_matches) - 10} more possible conditions"
+            
             return {
-                'disease': 'Possible conditions found',
+                'disease': f'Found {len(all_matches)} possible conditions',
                 'ayurvedic': 'Please consult an Ayurvedic practitioner for personalized treatment.',
                 'medicine': 'Please consult a healthcare professional for proper diagnosis.',
-                'confidence': 0,
+                'confidence': round(best_score * 100, 0) if best_score > 0 else 0,
                 'severity': 'unknown',
-                'description': f'Your symptoms might indicate:\n{suggestion_text}\n\nTry adding more symptoms for better results.',
-                'precautions': 'Always seek professional medical advice for an accurate diagnosis.' 
+                'description': f'Your symptoms could indicate these conditions:\n{condition_text}\n\nAdd more symptoms for more accurate results.',
+                'precautions': 'Always seek professional medical advice for an accurate diagnosis. This is not a substitute for medical consultation.'
             }
         else:
             return {
@@ -205,7 +232,7 @@ def diagnose_symptoms(symptoms_text):
                 'confidence': 0,
                 'severity': 'unknown',
                 'description': 'Try describing your symptoms in simple terms like: fever, headache, cough, stomach pain, etc.',
-                'precautions': 'Always seek professional medical advice for an accurate diagnosis.' 
+                'precautions': 'Always seek professional medical advice for an accurate diagnosis.'
             }
 
 @app.route('/')
